@@ -14,7 +14,6 @@ namespace Yatzy
     {
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler? PropertyChanged;
-        public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
         public virtual void OnPropertyChanged(string propertyName)
         {
@@ -23,8 +22,8 @@ namespace Yatzy
         #endregion
 
         public string Name { get; set; }
-        private int _point;
-        public int Point
+        private int? _point;
+        public int? Point
         {
             get => _point;
             set
@@ -77,10 +76,32 @@ namespace Yatzy
             }
         }
 
+        private bool _hasPoints = false;
+
+        public bool HasPoints
+        {
+            get => _hasPoints;
+            set
+            {
+                if (_hasPoints != value)
+                {
+                    _hasPoints = value;
+                    OnPropertyChanged(nameof(HasPoints));
+                }
+            }
+        }
+
         public PointsClass(string name, int point)
         {
             Name = name;
-            Point = point;
+            if (name == "")
+            {
+                Point = null;
+
+            } else
+            {
+                Point = point;
+            }
         }
 
     }

@@ -2,12 +2,16 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:local="clr-namespace:Yatzy"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="700">
-
+        Title="Yatzy" Height="340" Width="700" >
+    <mah:MetroWindow.Resources>
+        <local:SignConverter x:Key="SignConverter"/>
+        <local:AddSpaceConverter x:Key="AddSpaceConverter"/>
+    </mah:MetroWindow.Resources>       
     <Grid Margin="20">
 
         <Grid.RowDefinitions>
@@ -20,10 +24,17 @@
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Row="0" Margin="0 0 0 10">
-            <TextBlock Text="{Binding Rollstext}" HorizontalAlignment="Center" Margin="0 0 80 10" FontSize="24" ></TextBlock>
             <StackPanel Orientation="Horizontal">
-                <Button Content="{Binding StartButton}" Width="80" Margin="0 0 10 0" Height="40" Click="NewGame_Click" IsEnabled="{Binding OutofRolls}"></Button>
+                <Button  Style="{DynamicResource MahApps.Styles.Button.Circle}" BorderThickness="0"  FontSize="24" FontWeight="Bold" Width="50" Margin="0 0 10 0" Height="50" Click="NewGame_Click" IsEnabled="{Binding OutofRolls}">
+                    <Button.Content>
+                        <Image Source="{Binding StartButton}" Width="35" Height="35" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="UniformToFill" ></Image>
 
+                    </Button.Content>
+                    <!--<Button.Content>
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="{Binding StartButton}"></TextBlock>
+                    </Button.Content>-->
+                </Button>
+                    
                 <ItemsControl ItemsSource="{Binding Dices}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -33,7 +44,8 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Border x:Name="border1" Tag="{Binding}" Margin="0 0 10 0" Width="50"  BorderBrush="blue" BorderThickness="2" CornerRadius="3" MouseDown="Border_MouseDown">
-                                <Image Source="{Binding ImageSource}"></Image>
+                                <Image Source="{Binding ImageSource}"/>
+
                             </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -42,12 +54,7 @@
         </StackPanel>
         
         <ItemsControl ItemsSource="{Binding Points}" Grid.Row="1">
-            <ItemsControl.Resources>
-                <Style TargetType="TextBlock">
-                    <Setter Property="FontSize" Value="20"></Setter>
-                    <Setter Property="FontFamily" Value="Roboto"></Setter>
-                </Style>
-            </ItemsControl.Resources>
+
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel Orientation="Vertical"></WrapPanel>
@@ -56,6 +63,7 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Grid>
+                        
                         <Grid.Resources>
                             <Style x:Key="strikethrough" TargetType="TextBlock">
                                 <Setter Property="TextDecorations">
@@ -69,28 +77,39 @@
                                         </TextDecorationCollection>
                                     </Setter.Value>
                                 </Setter>
+                                <Setter Property="FontSize" Value="16"></Setter>
+                                <Setter Property="FontFamily" Value="Roboto"></Setter>
                             </Style>
+                            
                         </Grid.Resources>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="100"></ColumnDefinition>
                             <ColumnDefinition Width="*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="{Binding Name}" MouseRightButtonDown="TextBlock_MouseRightButtonDown" MouseLeftButtonDown="TextBlock_MouseDown" FontWeight="{Binding Font}" TextDecorations="{Binding Overstruken}" Style="{StaticResource strikethrough}" Foreground="{Binding FontColor}"></TextBlock>
-                        <TextBlock Margin="10 0 10 0" Grid.Column="1" Text="{Binding Point}" FontWeight="{Binding Font}" TextDecorations="{Binding Overstruken}" Style="{StaticResource strikethrough}" Foreground="{Binding FontColor}"></TextBlock>
+                        <TextBlock Margin="10 0 10 0" Grid.Column="1"   FontWeight="{Binding Font}" TextDecorations="{Binding Overstruken}" Style="{StaticResource strikethrough}" Foreground="{Binding FontColor}">
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource SignConverter}">
+                                    <Binding Path="Name" />
+                                    <Binding Path="Point" />
+                                    <Binding Path="DataContext" RelativeSource="{RelativeSource AncestorType=ItemsControl}"></Binding>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 
         <StackPanel Grid.Column="1" Grid.RowSpan="2">
-            <TextBlock Margin="0 20 0 10 " HorizontalAlignment="Center" Text="Highscore"></TextBlock>
+            <TextBlock FontSize="16" FontFamily="Roboto" FontWeight="Bold" Margin="0 20 0 10 " HorizontalAlignment="Center" Text="Highscore"></TextBlock>
             <ItemsControl ItemsSource="{Binding Topscorer}">
 
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock>
-                            <Run Text="{Binding Index}"></Run>
-                            <Run Text=". "></Run>
+                        <TextBlock FontFamily="Roboto" FontSize="16" Foreground="{Binding FontColor}">
+                            <Run Text="{Binding Index, Converter={StaticResource AddSpaceConverter}}"></Run>
+
                             <Run Text="{Binding Datum}"></Run>
                             <Run Text="{Binding Score}"></Run>
                         </TextBlock>

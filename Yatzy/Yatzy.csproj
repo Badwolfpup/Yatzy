@@ -15,6 +15,9 @@
     <None Remove="Images\dice4.png" />
     <None Remove="Images\dice5.png" />
     <None Remove="Images\dice6.png" />
+    <None Remove="Images\play.png" />
+    <None Remove="Images\playagain.png" />
+    <None Remove="Images\redx.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,6 +32,9 @@
     <Resource Include="Images\dice4.png" />
     <Resource Include="Images\dice5.png" />
     <Resource Include="Images\dice6.png" />
+    <Resource Include="Images\play.png" />
+    <Resource Include="Images\playagain.png" />
+    <Resource Include="Images\redx.png" />
   </ItemGroup>
 
 </Project>

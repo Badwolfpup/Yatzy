@@ -9,6 +9,8 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
+using System.Windows.Media.Media3D;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -39,7 +41,7 @@ namespace Yatzy
         }
         #endregion
 
-        private ObservableCollection<HighScore> _topscorer;
+        private ObservableCollection<HighScore>? _topscorer;
         public ObservableCollection<HighScore> Topscorer
         {
             get => _topscorer;
@@ -52,8 +54,21 @@ namespace Yatzy
                 }
             }
         }
+        private FontIcon? _icon;
+        public FontIcon Icon
+        {
+            get => _icon;
+            set
+            {
+                if (value != _icon)
+                {
+                    _icon = value;
+                    OnPropertyChanged(nameof(Icon));
+                }
+            }
+        }
 
-        private ObservableCollection<Dice> _dices;
+        private ObservableCollection<Dice>? _dices;
         public ObservableCollection<Dice> Dices
         {
             get => _dices;
@@ -67,7 +82,7 @@ namespace Yatzy
             }
         }
 
-        private string _startbutton = "Start game";
+        private string _startbutton = $"pack://application:,,,/Images/play.png";
         public string StartButton
         {
             get => _startbutton;
@@ -81,19 +96,7 @@ namespace Yatzy
             }
         }
 
-        private string? _rollstext;
-        public string? Rollstext
-        {
-            get => _rollstext;
-            set
-            {
-                if (_rollstext != value)
-                {
-                    _rollstext = value;
-                    OnPropertyChanged(nameof(Rollstext));
-                }
-            }
-        }
+
 
         private int _selectedindex;
         public int SelectedIndex
@@ -173,43 +176,32 @@ namespace Yatzy
         {
             InitializeComponent();
             Dices = new ObservableCollection<Dice>();
+            Icon = new FontIcon();
             DataContext = this;
             Topscorer = Load();
             AddIndex();
+            SetIcon("\xE777");
             InitializePoints();
+        }
+
+        private void SetIcon(string glyph)
+        {
+
+            Icon.FontFamily = new FontFamily("Segoe MDL2 Assets");
+            Icon.Glyph = glyph;
+
         }
 
         private void InitializePoints()
         {
             Points = new ObservableCollection<PointsClass>(
-    new[]
-    {
-        "Ettor", "Tvåor", "Treor", "Fyror", "Femmor", "Sexor", "Summa:", "Bonus",
-        "Ett par", "Två par", "Triss", "Fyrtal", "Liten Stege", "Stor Stege",
-        "Kåk", "Chans", "Yatzy", "Totalpoäng:"
-    }.Select(name => new PointsClass(name, 0))
-);
-            //Points =  new ObservableCollection<PointsClass>
-            //{
-            //    new PointsClass("Ettor", 0),
-            //    new PointsClass ("Tvåor", 0),
-            //    new PointsClass ("Treor", 0),
-            //    new PointsClass ("Fyror", 0),
-            //    new PointsClass ("Femmor", 0),
-            //    new PointsClass ("Sexor", 0),
-            //    new PointsClass ("Summa:", 0),
-            //    new PointsClass ("Bonus", 0),
-            //    new PointsClass ("Ett par", 0),
-            //    new PointsClass ("Två par", 0),
-            //    new PointsClass ("Triss", 0),
-            //    new PointsClass ("Fyrtal", 0),
-            //    new PointsClass ("Liten Stege", 0),
-            //    new PointsClass ("Stor Stege", 0),
-            //    new PointsClass ("Kåk", 0),
-            //    new PointsClass ("Chans", 0),
-            //    new PointsClass ("Yatzy", 0),
-            //    new PointsClass ("Totalpoäng:", 0),
-            //};
+            new[]
+                {
+                    "Ettor", "Tvåor", "Treor", "Fyror", "Femmor", "Sexor", "Summa:", "Bonus", "", "",
+                    "Ett par", "Två par", "Triss", "Fyrtal", "Liten Stege", "Stor Stege",
+                    "Kåk", "Chans", "Yatzy", "Totalpoäng:"
+                }.Select(name =>  new PointsClass(name, 0))
+            );
         }
 
         private void Reset()
@@ -218,7 +210,7 @@ namespace Yatzy
             {
                 Val.Add(item);
             }
-            StartButton = "Start  game";
+            StartButton = $"pack://application:,,,/Images/playagain.png"; 
             Started = false;
             _hasaddednonus = false;
             InitializePoints();
@@ -235,7 +227,7 @@ namespace Yatzy
             if (Val.Count == 0 && !_newgame)
             {
                 CheckHighscore();
-                StartButton = "Start new game";
+                StartButton = $"pack://application:,,,/Images/playagain.png";
                 _newgame = true;
                 return;
             }
@@ -245,8 +237,7 @@ namespace Yatzy
             {
                 SelectedIndex = 0;
                 Dices = new ObservableCollection<Dice>();
-                Rollstext = _numberofrolls == 1 ? $"{_numberofrolls} roll remaining." : $"{_numberofrolls} rolls remaining.";
-                StartButton = "Roll";
+                LoadImageNumberOfRolls(_numberofrolls);
                 Started = true;
                 for (int i = 0; i < 5; i++)
                 {
@@ -256,7 +247,7 @@ namespace Yatzy
             else
             {
                 _numberofrolls--;
-                Rollstext = _numberofrolls == 1 ? $"{_numberofrolls} roll remaining." : $"{_numberofrolls} rolls remaining.";
+                LoadImageNumberOfRolls(_numberofrolls);
 
                 for (int i = 0; i < 5; i++)
                 {
@@ -267,6 +258,11 @@ namespace Yatzy
                 }
                 if (_numberofrolls <= 0) { OutofRolls = false; return; }
             }
+        }
+
+        private void LoadImageNumberOfRolls(int rolls)
+        {
+            StartButton = _numberofrolls != 0 ? $"pack://application:,,,/Images/dice{rolls}.png" : $"pack://application:,,,/Images/redx.png";
         }
 
         private void NewGame_Click(object sender, RoutedEventArgs e)
@@ -328,9 +324,31 @@ namespace Yatzy
                 if (Points?[6].Point >= 63)
                 {
                     Points[7].Point = 50;
-                    Points[17].Point += Points[7].Point;
+                    Points[19].Point += Points[7].Point;
                     _hasaddednonus = true;
 
+                }
+                else
+                {
+                    int? difference = 0;
+                    for (int i = 0; i < 6; i++)
+                    {
+                        if (Points[i].HasPoints)
+                        {
+                            difference += Points[i].Point - ((i + 1) * 3);
+                            Points[i].HasPoints = true;
+                        }
+                    }
+                    if (Points.Take(6).Any(x => !x.HasPoints))
+                    {
+                        Points[7].Point = difference;
+                        Points[7].FontColor = Points[7].Point < 0 ? Brushes.Red : Brushes.Green;
+                    }
+                    else
+                    {
+                        Points[7].Point = 0;
+                        Points[7].FontColor = Brushes.Red;
+                    }
                 }
             }
             
@@ -367,8 +385,10 @@ namespace Yatzy
         {
             Points[pos].Font = FontWeights.Bold; 
             Points[pos].Point = Dices.Sum(x => x.DiceValue == värde ? värde : 0); 
+           
             Points[6].Point += Points[pos].Point; 
-            Points[17].Point += Points[pos].Point;
+            Points[19].Point += Points[pos].Point;
+            Points[pos].HasPoints = true;
             Val.Remove(combo);
         }
 
@@ -377,10 +397,10 @@ namespace Yatzy
             if (Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 2).Count() > 0)
             {
                 var templist = Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 2).OrderByDescending(group => group.Key).FirstOrDefault();
-                Points[8].Point = templist.Key * 2;
-                Points[8].Font = FontWeights.Bold;
+                Points[10].Point = templist.Key * 2;
+                Points[10].Font = FontWeights.Bold;
                 Val.Remove("Ett par");
-                Points[17].Point += Points[8].Point;
+                Points[19].Point += Points[10].Point;
                 return true;
             }
             MessageBox.Show("Du har inte något ettpar");
@@ -394,12 +414,12 @@ namespace Yatzy
                 var templist = Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 2).OrderByDescending(group => group.Key);
                 foreach (var item in templist)
                 {
-                    Points[9].Point += item.Key * 2;
+                    Points[11].Point += item.Key * 2;
 
                 }
                 Val.Remove("Två par");
-                Points[9].Font = FontWeights.Bold;
-                Points[17].Point += Points[9].Point;
+                Points[11].Font = FontWeights.Bold;
+                Points[19].Point += Points[11].Point;
                 return true;
             }
             MessageBox.Show("Du har inte något ettpar");
@@ -411,10 +431,10 @@ namespace Yatzy
             if (Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 3).Count() > 0)
             {
                 var templist = Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 3).FirstOrDefault();
-                Points[10].Point = templist.Key * 3;
+                Points[12].Point = templist.Key * 3;
                 Val.Remove("Triss");
-                Points[10].Font = FontWeights.Bold;
-                Points[17].Point += Points[10].Point;
+                Points[12].Font = FontWeights.Bold;
+                Points[19].Point += Points[12].Point;
                 return true;
             }
             MessageBox.Show("Du har inte något ettpar");
@@ -426,10 +446,10 @@ namespace Yatzy
             if (Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 4).Count() > 0)
             {
                 var templist = Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 4).FirstOrDefault();
-                Points[11].Point = templist.Key * 4;
+                Points[13].Point = templist.Key * 4;
                 Val.Remove("Fyrtal");
-                Points[11].Font = FontWeights.Bold;
-                Points[17].Point += Points[11].Point;
+                Points[13].Font = FontWeights.Bold;
+                Points[19].Point += Points[13].Point;
                 return true;
             }
             MessageBox.Show("Du har inte något ettpar");
@@ -441,10 +461,10 @@ namespace Yatzy
             
             if (Dices.Select(x => x.DiceValue).OrderBy(value => value).SequenceEqual(new[] { 1, 2, 3, 4, 5 }))
             {
-                Points[12].Point = 15;
+                Points[14].Point = 15;
                 Val.Remove("Liten Stege");
-                Points[12].Font = FontWeights.Bold;
-                Points[17].Point += Points[12].Point;
+                Points[14].Font = FontWeights.Bold;
+                Points[19].Point += Points[14].Point;
                 return true;
             }
             MessageBox.Show("Du har inte något ettpar");
@@ -456,11 +476,11 @@ namespace Yatzy
             if (Dices.Select(x => x.DiceValue).OrderBy(value => value).SequenceEqual(new[] { 2, 3, 4, 5, 6 }))
             {
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
-                Points[13].Point = 20;
+                Points[15].Point = 20;
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
                 Val.Remove("Stor Stege");
-                Points[13].Font = FontWeights.Bold;
-                Points[17].Point += Points[13].Point;
+                Points[15].Font = FontWeights.Bold;
+                Points[19].Point += Points[15].Point;
                 return true;
             }
             MessageBox.Show("Du har inte något ettpar");
@@ -475,12 +495,12 @@ namespace Yatzy
             {
                 foreach (var item in groups.OrderByDescending(x => x.Key))
                 {
-                    Points[14].Point += item.Count() == 2 ? item.Key * 2 : item.Key * 3;
+                    Points[16].Point += item.Count() == 2 ? item.Key * 2 : item.Key * 3;
 
                 }
                 Val.Remove("Kåk");
-                Points[14].Font = FontWeights.Bold;
-                Points[17].Point += Points[14].Point;
+                Points[16].Font = FontWeights.Bold;
+                Points[19].Point += Points[16].Point;
                 return true;
             }
             MessageBox.Show("Du har inte något ettpar");
@@ -489,10 +509,10 @@ namespace Yatzy
 
         private bool Chans()
         {
-            Points[15].Point = Dices.Sum(x => x.DiceValue);
-            Points[15].Font = FontWeights.Bold;
+            Points[17].Point = Dices.Sum(x => x.DiceValue);
+            Points[17].Font = FontWeights.Bold;
             Val.Remove("Chans");
-            Points[17].Point += Points[15].Point;
+            Points[19].Point += Points[17].Point;
             return true;
         }
 
@@ -500,10 +520,10 @@ namespace Yatzy
         {
             if (Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() == 5).Count() > 0)
             {
-                Points[16].Point = 50;
+                Points[18].Point = 50;
                 Val.Remove("Yatzy");
-                Points[16].Font = FontWeights.Bold;
-                Points[17].Point += Points[16].Point;
+                Points[18].Font = FontWeights.Bold;
+                Points[19].Point += Points[18].Point;
                 return true;
             }
             MessageBox.Show("Du har inte något ettpar");
@@ -553,9 +573,18 @@ namespace Yatzy
 
         private void CheckHighscore()
         {
-            Topscorer.Add(new HighScore(Points[17].Point));
-            Topscorer = new ObservableCollection<HighScore>(Topscorer.OrderByDescending(x => x.Score));
-            if (Topscorer?.Count > 10) Topscorer = new ObservableCollection<HighScore>(Topscorer.Take(10));
+            if (Points[17].Point > Topscorer.Min(x => x.Score))
+            {
+                HighScore s = Topscorer.SingleOrDefault(x => x.IsLast);
+                s.IsLast = false;
+            }
+            Topscorer = new ObservableCollection<HighScore>(
+                Topscorer.Append(new HighScore(Points[19].Point) { IsLast = true })
+                .OrderByDescending(x => x.Score).Take(10)
+            );
+            //Topscorer.Add(new HighScore(Points[19].Point) { IsLast = true });
+            //Topscorer = new ObservableCollection<HighScore>(Topscorer.OrderByDescending(x => x.Score));
+            //Topscorer = new ObservableCollection<HighScore>(Topscorer.Take(10));
             AddIndex();
             Save();
 
@@ -570,5 +599,43 @@ namespace Yatzy
         }
     }
 
-   
+    public class SignConverter : IMultiValueConverter
+    {
+
+
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            var main = values[2] as MainWindow;
+            var points = main.Points;
+
+
+            var name = values[0].ToString();
+            var point = values[1] as int?;
+            if (name == "Bonus" && point > 0 && points[6].Point < 63) return $"+{point}";
+            return point.ToString();
+
+        }
+
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class AddSpaceConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var num = value as int?;
+            if (num == null) return "";
+            if (num < 10) return $"{num}.   ";
+            return $"{num}. ";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
