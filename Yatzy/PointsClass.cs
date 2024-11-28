@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
 
 namespace Yatzy
 {
-    public class PointsClass: INotifyPropertyChanged
+    public class PointsClass : INotifyPropertyChanged
     {
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -98,7 +92,8 @@ namespace Yatzy
             {
                 Point = null;
 
-            } else
+            }
+            else
             {
                 Point = point;
             }

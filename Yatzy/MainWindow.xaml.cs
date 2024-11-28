@@ -1,29 +1,14 @@
-﻿using System.Collections.ObjectModel;
-using System.Collections.Specialized;
+﻿using MahApps.Metro.Controls;
+using Newtonsoft.Json;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics.Eventing.Reader;
-using System.Text;
+using System.Globalization;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Media.Media3D;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Text.RegularExpressions;
-using System.Printing;
-using System.Diagnostics.Metrics;
-using System.Windows.Shell;
-using System.Runtime.CompilerServices;
-using Newtonsoft.Json;
-using System.IO;
-using System.Globalization;
-using System.Collections;
-using MahApps.Metro.Controls;
 
 namespace Yatzy
 {
@@ -42,7 +27,7 @@ namespace Yatzy
         #endregion
 
         private ObservableCollection<HighScore>? _topscorer;
-        public ObservableCollection<HighScore> Topscorer
+        public ObservableCollection<HighScore>? Topscorer
         {
             get => _topscorer;
             set
@@ -114,7 +99,7 @@ namespace Yatzy
             }
         }
 
-        public  ObservableCollection<string> Val { get; } = new ObservableCollection<string>(
+        public ObservableCollection<string> Val { get; } = new ObservableCollection<string>(
             new[]
             {
             "Ettor", "Tvåor", "Treor", "Fyror", "Femmor", "Sexor", "Ett par", "Två par",
@@ -142,7 +127,7 @@ namespace Yatzy
                 }
             }
         }
-            
+
         private bool _outofrolls = true;
         public bool OutofRolls
         {
@@ -160,9 +145,9 @@ namespace Yatzy
         private bool _newgame = false;
         private int _numberofrolls = 3;
         private bool _hasaddednonus = false;
-        private PointsClass _total;
-        private PointsClass _summa;
-        private PointsClass _bonus;
+        private PointsClass? _total;
+        private PointsClass? _summa;
+        private PointsClass? _bonus;
 
         public MainWindow()
         {
@@ -183,7 +168,7 @@ namespace Yatzy
                     "Ettor", "Tvåor", "Treor", "Fyror", "Femmor", "Sexor", "Summa:", "Bonus", "", "",
                     "Ett par", "Två par", "Triss", "Fyrtal", "Liten Stege", "Stor Stege",
                     "Kåk", "Chans", "Yatzy", "Totalpoäng:"
-                }.Select(name =>  new PointsClass(name, 0))
+                }.Select(name => new PointsClass(name, 0))
             );
             _summa = Points.Where(x => x.Name == "Summa:").FirstOrDefault();
             _bonus = Points.Where(x => x.Name == "Bonus").FirstOrDefault();
@@ -192,15 +177,15 @@ namespace Yatzy
 
         private void Reset()
         {
-            foreach(var item in ValOriginal )
+            foreach (var item in ValOriginal)
             {
                 Val.Add(item);
             }
-            StartButton = $"pack://application:,,,/Images/playagain.png"; 
+            StartButton = $"pack://application:,,,/Images/playagain.png";
             Started = false;
             _hasaddednonus = false;
             InitializePoints();
-            
+
         }
 
         private void RollDices()
@@ -261,13 +246,13 @@ namespace Yatzy
             Border? b = sender as Border;
             if (b == null) return;
             if (b.Tag is not Dice d) return;
-            if (!d.Issaved) 
-            { 
+            if (!d.Issaved)
+            {
                 b.BorderBrush = Brushes.Crimson;
                 d.Issaved = true;
             }
-            else 
-            { 
+            else
+            {
                 b.BorderBrush = Brushes.Blue;
                 d.Issaved = false;
             }
@@ -337,15 +322,16 @@ namespace Yatzy
                     }
                 }
             }
-            
+
         }
 
         private bool CheckCombination(string combo)
         {
             if (IsValidCombo(combo))
             {
-                var point = Points.Where(x => x.Name == combo).FirstOrDefault();
-                var total = Points.Where(x => x.Name == "Totalpoäng:").ToList().FirstOrDefault();
+                PointsClass? point = Points.Where(x => x.Name == combo).FirstOrDefault();
+                PointsClass? total = Points.Where(x => x.Name == "Totalpoäng:").ToList().FirstOrDefault();
+
                 switch (combo)
                 {
                     case "Ettor": { SelectNumber(1, 0, combo); return true; }
@@ -419,29 +405,29 @@ namespace Yatzy
                         }
                     default: MessageBox.Show("Ogiltigt val"); return false;
                 };
-            } else
+            }
+            else
             {
                 MessageBox.Show("Du kan inte välja den kombinationen. \nDu har antingen inte kombinationen eller så har du redan valt den.");
                 return false;
             }
-            
+
         }
 
-        private void ChangeScore(PointsClass point, string combo, PointsClass total)
+        private void ChangeScore(PointsClass? point, string combo, PointsClass? total)
         {
+            if (point == null || total == null) return;
             point.Font = FontWeights.Bold;
             Val.Remove(combo);
             total.Point += point.Point;
         }
 
-
-
         private void SelectNumber(int värde, int pos, string combo)
         {
-            Points[pos].Font = FontWeights.Bold; 
-            Points[pos].Point = Dices.Sum(x => x.DiceValue == värde ? värde : 0); 
-           
-            _summa.Point += Points[pos].Point; 
+            Points[pos].Font = FontWeights.Bold;
+            Points[pos].Point = Dices.Sum(x => x.DiceValue == värde ? värde : 0);
+
+            _summa.Point += Points[pos].Point;
             _total.Point += Points[pos].Point;
             Points[pos].HasPoints = true;
             Val.Remove(combo);
@@ -464,23 +450,45 @@ namespace Yatzy
                 "Liten Stege" => Dices.Select(x => x.DiceValue).OrderBy(value => value).SequenceEqual(new[] { 1, 2, 3, 4, 5 }) && Val.Contains(combo),
                 "Stor Stege" => Dices.Select(x => x.DiceValue).OrderBy(value => value).SequenceEqual(new[] { 2, 3, 4, 5, 6 }) && Val.Contains(combo),
                 "Kåk" => Dices.GroupBy(x => x.DiceValue).Any(group => group.Count() == 2) && Dices.GroupBy(x => x.DiceValue).Any(group => group.Count() == 3) && Val.Contains(combo),
-                "Chans" =>  Val.Contains(combo),
+                "Chans" => Val.Contains(combo),
                 "Yatzy" => Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() == 5).Count() > 0 && Val.Contains(combo),
                 _ => false
             };
             return result;
-            
+
         }
 
+        private void CheckHighscore()
+        {
+            if (_total.Point > Topscorer?.Min(x => x.Score) || Topscorer.Count < 10)
+            {
+                HighScore? s = Topscorer.FirstOrDefault(x => x.IsLast);
+                s.IsLast = false;
+                s.FontColor = Brushes.Black;
 
-            
+            }
+            Topscorer = new ObservableCollection<HighScore>(
+                Topscorer.Append(new HighScore(_total.Point) { FontColor = Brushes.Green, IsLast = true })
+                .OrderByDescending(x => x.Score).Take(10)
+            );
+            AddIndex();
+            Save();
 
- 
+        }
+
+        private void AddIndex()
+        {
+            for (int i = 0; i < Topscorer?.Count; i++)
+            {
+                Topscorer[i].Index = i + 1;
+            }
+        }
+
         private void TextBlock_MouseDown(object sender, MouseButtonEventArgs e)
         {
             TextBlock? t = sender as TextBlock;
             if (t == null) return;
-            PointsClass points = t?.DataContext as PointsClass;
+            PointsClass? points = t?.DataContext as PointsClass;
             if (points == null) return;
             if (points?.Name != "Summa:" && points?.Name != "Bonus" && points?.Name != "Totalpoäng:")
             {
@@ -497,7 +505,7 @@ namespace Yatzy
             {
                 Crossout(points.Name);
             }
-            
+
         }
 
         private void Save()
@@ -507,41 +515,17 @@ namespace Yatzy
             File.WriteAllText(filename, file);
         }
 
-        private ObservableCollection<HighScore> Load()
+        private ObservableCollection<HighScore>? Load()
         {
             string filename = AppDomain.CurrentDomain.BaseDirectory + "Topplista.json";
-            if (!File.Exists(filename)) return new ObservableCollection<HighScore>(); 
-            
+            if (!File.Exists(filename)) return new ObservableCollection<HighScore>();
+
             string file = File.ReadAllText(filename);
             if (string.IsNullOrEmpty(file)) return new ObservableCollection<HighScore>();
             return JsonConvert.DeserializeObject<ObservableCollection<HighScore>>(file);
         }
 
-        private void CheckHighscore()
-        {
-            if (_total.Point > Topscorer.Min(x => x.Score) || Topscorer.Count < 10)
-            {
-                HighScore s = Topscorer.FirstOrDefault(x => x.IsLast);
-                s.IsLast = false;
-                s.FontColor = Brushes.Black;
 
-            }
-            Topscorer = new ObservableCollection<HighScore>(
-                Topscorer.Append(new HighScore(_total.Point) { FontColor = Brushes.Green, IsLast = true })
-                .OrderByDescending(x => x.Score).Take(10)
-            ); 
-            AddIndex();
-            Save();
-
-        }
-
-        private void AddIndex()
-        {
-            for (int i = 0; i < Topscorer?.Count; i++)
-            {
-                Topscorer[i].Index = i + 1;
-            }
-        }
     }
 
     public class SignConverter : IMultiValueConverter

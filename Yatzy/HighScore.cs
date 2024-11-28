@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 using System.Windows.Media;
 
 namespace Yatzy
@@ -14,7 +9,7 @@ namespace Yatzy
         {
             Score = score;
             Datum = DateTime.Now.ToString("yyyy-MM-dd");
-            
+
         }
         public bool IsLast { get; set; }
         private Brush _fontcolor = Brushes.Black;
@@ -37,11 +32,12 @@ namespace Yatzy
             get => _index;
             set
             {
-                if (_index != value) {
+                if (_index != value)
+                {
                     _index = value;
                     OnPropertyChanged(nameof(Index));
-                } 
-            } 
+                }
+            }
         }
 
         public int? Score { get; set; }

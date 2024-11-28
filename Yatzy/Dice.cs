@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
 namespace Yatzy
 {
-    public class Dice: INotifyPropertyChanged
+    public class Dice : INotifyPropertyChanged
     {
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -36,7 +30,7 @@ namespace Yatzy
         }
 
         private int _dicevalue;
-        public int DiceValue 
+        public int DiceValue
         {
             get => _dicevalue;
             set
