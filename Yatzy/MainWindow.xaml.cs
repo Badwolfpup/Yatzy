@@ -356,180 +356,140 @@ namespace Yatzy
 
         private bool CheckCombination(string combo)
         {
-            switch (combo)
+            if (IsValidCombo(combo))
             {
-                case "Ettor": { SelectNumber(1, 0, combo); return true; }
-                case "Tvåor": { SelectNumber(2, 1, combo); return true; }
-                case "Treor": { SelectNumber(3, 2, combo); return true; }
-                case "Fyror": { SelectNumber(4, 3, combo); return true; }
-                case "Femmor": {SelectNumber(5, 4, combo); return true; }
-                case "Sexor": {SelectNumber(6, 5, combo); return true; }
-                case "Ett par":  return Ettpar();
-                case "Två par": return Tvåpar(); 
-                case "Triss": return Triss();
-                case "Fyrtal": return Fyrtal(); 
-                case "Liten Stege": return Lstege(); 
-                case "Stor Stege": return Sstege(); ;
-                case "Kåk": return Kåk();
-                case "Chans": return Chans();
-                case "Yatzy": return Yatzy();
-                default: MessageBox.Show("Ogiltigt val"); return false;
-            }; 
+                var point = Points.Where(x => x.Name == combo).FirstOrDefault();
+                var total = Points.Where(x => x.Name == "Totalpoäng:").ToList().FirstOrDefault();
+                switch (combo)
+                {
+                    case "Ettor": { SelectNumber(1, 0, combo); return true; }
+                    case "Tvåor": { SelectNumber(2, 1, combo); return true; }
+                    case "Treor": { SelectNumber(3, 2, combo); return true; }
+                    case "Fyror": { SelectNumber(4, 3, combo); return true; }
+                    case "Femmor": { SelectNumber(5, 4, combo); return true; }
+                    case "Sexor": { SelectNumber(6, 5, combo); return true; }
+                    case "Ett par":
+                        {
+                            point.Point = Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 2).OrderByDescending(group => group.Key).FirstOrDefault().Key * 2;
+                            ChangeScore(point, combo, total);
+                            return true;
+                        }
+                    case "Två par":
+                        {
+                            var templist = Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 2).OrderByDescending(group => group.Key);
+                            foreach (var item in templist)
+                            {
+                                point.Point += item.Key * 2;
 
+                            }
+                            ChangeScore(point, combo, total);
+                            return true;
+                        }
+                    case "Triss":
+                        {
+                            point.Point = Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 3).FirstOrDefault().Key * 3;
+                            ChangeScore(point, combo, total);
+                            return true;
+                        }
+                    case "Fyrtal":
+                        {
+                            point.Point = Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 4).FirstOrDefault().Key * 4;
+                            ChangeScore(point, combo, total);
+                            return true;
+                        }
+                    case "Liten Stege":
+                        {
+                            point.Point = 15;
+                            ChangeScore(point, combo, total);
+                            return true;
+                        }
+                    case "Stor Stege":
+                        {
+                            point.Point = 20;
+                            ChangeScore(point, combo, total);
+                            return true;
+                        }
+                    case "Kåk":
+                        {
+                            foreach (var item in Dices.GroupBy(x => x.DiceValue).OrderByDescending(x => x.Key))
+                            {
+                                point.Point += item.Count() == 2 ? item.Key * 2 : item.Key * 3;
+
+                            }
+                            ChangeScore(point, combo, total);
+                            return true;
+                        }
+                    case "Chans":
+                        {
+                            point.Point = Dices.Sum(x => x.DiceValue);
+                            ChangeScore(point, combo, total);
+                            return true;
+                        }
+                    case "Yatzy":
+                        {
+                            point.Point = 50;
+                            ChangeScore(point, combo, total);
+                            return true;
+                        }
+                    default: MessageBox.Show("Ogiltigt val"); return false;
+                };
+            } else
+            {
+                MessageBox.Show("Du har inte den kombinationen");
+                return false;
+            }
             
         }
 
-        
+        private void ChangeScore(PointsClass point, string combo, PointsClass total)
+        {
+            point.Font = FontWeights.Bold;
+            Val.Remove(combo);
+            total.Point += point.Point;
+        }
+
+
 
         private void SelectNumber(int värde, int pos, string combo)
         {
             Points[pos].Font = FontWeights.Bold; 
             Points[pos].Point = Dices.Sum(x => x.DiceValue == värde ? värde : 0); 
            
-            Points[6].Point += Points[pos].Point; 
-            Points[19].Point += Points[pos].Point;
+            Points.Where(x => x.Name == "Summa:").FirstOrDefault().Point += Points[pos].Point; 
+            Points.Where(x => x.Name == "Totalpoäng:").FirstOrDefault().Point += Points[pos].Point;
             Points[pos].HasPoints = true;
             Val.Remove(combo);
         }
 
-        private bool Ettpar()
+        private bool IsValidCombo(string combo)
         {
-            if (Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 2).Count() > 0)
+            bool result = combo switch
             {
-                var templist = Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 2).OrderByDescending(group => group.Key).FirstOrDefault();
-                Points[10].Point = templist.Key * 2;
-                Points[10].Font = FontWeights.Bold;
-                Val.Remove("Ett par");
-                Points[19].Point += Points[10].Point;
-                return true;
-            }
-            MessageBox.Show("Du har inte något ettpar");
-            return false;
-        }
-
-        private bool Tvåpar()
-        {
-            if (Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 2).Count() > 1)
-            {
-                var templist = Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 2).OrderByDescending(group => group.Key);
-                foreach (var item in templist)
-                {
-                    Points[11].Point += item.Key * 2;
-
-                }
-                Val.Remove("Två par");
-                Points[11].Font = FontWeights.Bold;
-                Points[19].Point += Points[11].Point;
-                return true;
-            }
-            MessageBox.Show("Du har inte något ettpar");
-            return false;
-        }
-
-        private bool Triss()
-        {
-            if (Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 3).Count() > 0)
-            {
-                var templist = Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 3).FirstOrDefault();
-                Points[12].Point = templist.Key * 3;
-                Val.Remove("Triss");
-                Points[12].Font = FontWeights.Bold;
-                Points[19].Point += Points[12].Point;
-                return true;
-            }
-            MessageBox.Show("Du har inte något ettpar");
-            return false;
-        }
-
-        private bool Fyrtal()
-        {
-            if (Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 4).Count() > 0)
-            {
-                var templist = Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 4).FirstOrDefault();
-                Points[13].Point = templist.Key * 4;
-                Val.Remove("Fyrtal");
-                Points[13].Font = FontWeights.Bold;
-                Points[19].Point += Points[13].Point;
-                return true;
-            }
-            MessageBox.Show("Du har inte något ettpar");
-            return false;
-        }
-
-        private bool Lstege()
-        {
+                "Ettor" => true,
+                "Tvåor" => true,
+                "Treor" => true,
+                "Fyror" => true,
+                "Femmor" => true,
+                "Sexor" => true,
+                "Ett par" => Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 2).Count() > 0,
+                "Två par" => Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 2).Count() > 1,
+                "Triss" => Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 3).Count() > 0,
+                "Fyrtal" => Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 4).Count() > 0,
+                "Liten Stege" => Dices.Select(x => x.DiceValue).OrderBy(value => value).SequenceEqual(new[] { 1, 2, 3, 4, 5 }),
+                "Stor Stege" => Dices.Select(x => x.DiceValue).OrderBy(value => value).SequenceEqual(new[] { 2, 3, 4, 5, 6 }),
+                "Kåk" => Dices.GroupBy(x => x.DiceValue).Any(group => group.Count() == 2) && Dices.GroupBy(x => x.DiceValue).Any(group => group.Count() == 3),
+                "Chans" => true,
+                "Yatzy" => Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() == 5).Count() > 0,
+                _ => false
+            };
+            return result;
             
-            if (Dices.Select(x => x.DiceValue).OrderBy(value => value).SequenceEqual(new[] { 1, 2, 3, 4, 5 }))
-            {
-                Points[14].Point = 15;
-                Val.Remove("Liten Stege");
-                Points[14].Font = FontWeights.Bold;
-                Points[19].Point += Points[14].Point;
-                return true;
-            }
-            MessageBox.Show("Du har inte något ettpar");
-            return false;
         }
 
-        private bool Sstege()
-        {
-            if (Dices.Select(x => x.DiceValue).OrderBy(value => value).SequenceEqual(new[] { 2, 3, 4, 5, 6 }))
-            {
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-                Points[15].Point = 20;
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-                Val.Remove("Stor Stege");
-                Points[15].Font = FontWeights.Bold;
-                Points[19].Point += Points[15].Point;
-                return true;
-            }
-            MessageBox.Show("Du har inte något ettpar");
-            return false;
 
-        }
+            
 
-        private bool Kåk()
-        {
-            var groups = Dices.GroupBy(x => x.DiceValue);
-            if (groups.Any(group => group.Count() == 2) && groups.Any(group => group.Count() == 3))
-            {
-                foreach (var item in groups.OrderByDescending(x => x.Key))
-                {
-                    Points[16].Point += item.Count() == 2 ? item.Key * 2 : item.Key * 3;
-
-                }
-                Val.Remove("Kåk");
-                Points[16].Font = FontWeights.Bold;
-                Points[19].Point += Points[16].Point;
-                return true;
-            }
-            MessageBox.Show("Du har inte något ettpar");
-            return false;
-        }
-
-        private bool Chans()
-        {
-            Points[17].Point = Dices.Sum(x => x.DiceValue);
-            Points[17].Font = FontWeights.Bold;
-            Val.Remove("Chans");
-            Points[19].Point += Points[17].Point;
-            return true;
-        }
-
-        private bool Yatzy()
-        {
-            if (Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() == 5).Count() > 0)
-            {
-                Points[18].Point = 50;
-                Val.Remove("Yatzy");
-                Points[18].Font = FontWeights.Bold;
-                Points[19].Point += Points[18].Point;
-                return true;
-            }
-            MessageBox.Show("Du har inte något ettpar");
-            return false;
-        }
-
+ 
         private void TextBlock_MouseDown(object sender, MouseButtonEventArgs e)
         {
             TextBlock? t = sender as TextBlock;
@@ -577,11 +537,12 @@ namespace Yatzy
             {
                 HighScore s = Topscorer.SingleOrDefault(x => x.IsLast);
                 s.IsLast = false;
+                s.FontColor = Brushes.Black;
             }
             Topscorer = new ObservableCollection<HighScore>(
-                Topscorer.Append(new HighScore(Points[19].Point) { IsLast = true })
+                Topscorer.Append(new HighScore(Points[19].Point) { FontColor = Brushes.Green, IsLast = true })
                 .OrderByDescending(x => x.Score).Take(10)
-            );
+            ); 
             //Topscorer.Add(new HighScore(Points[19].Point) { IsLast = true });
             //Topscorer = new ObservableCollection<HighScore>(Topscorer.OrderByDescending(x => x.Score));
             //Topscorer = new ObservableCollection<HighScore>(Topscorer.Take(10));
