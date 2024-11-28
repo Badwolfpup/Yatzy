@@ -54,19 +54,7 @@ namespace Yatzy
                 }
             }
         }
-        private FontIcon? _icon;
-        public FontIcon Icon
-        {
-            get => _icon;
-            set
-            {
-                if (value != _icon)
-                {
-                    _icon = value;
-                    OnPropertyChanged(nameof(Icon));
-                }
-            }
-        }
+
 
         private ObservableCollection<Dice>? _dices;
         public ObservableCollection<Dice> Dices
@@ -96,8 +84,6 @@ namespace Yatzy
             }
         }
 
-
-
         private int _selectedindex;
         public int SelectedIndex
         {
@@ -112,8 +98,8 @@ namespace Yatzy
             }
         }
 
-        private int _numberofrolls = 3;
-        private bool _hasaddednonus = false;
+
+
         private bool _started;
         public bool Started
         {
@@ -127,6 +113,7 @@ namespace Yatzy
                 }
             }
         }
+
         public  ObservableCollection<string> Val { get; } = new ObservableCollection<string>(
             new[]
             {
@@ -157,8 +144,6 @@ namespace Yatzy
         }
             
         private bool _outofrolls = true;
-        private bool _newgame = false;
-
         public bool OutofRolls
         {
             get => _outofrolls;
@@ -172,25 +157,23 @@ namespace Yatzy
             }
         }
 
+        private bool _newgame = false;
+        private int _numberofrolls = 3;
+        private bool _hasaddednonus = false;
+        private PointsClass _total;
+        private PointsClass _summa;
+        private PointsClass _bonus;
+
         public MainWindow()
         {
             InitializeComponent();
             Dices = new ObservableCollection<Dice>();
-            Icon = new FontIcon();
             DataContext = this;
             Topscorer = Load();
             AddIndex();
-            SetIcon("\xE777");
             InitializePoints();
         }
 
-        private void SetIcon(string glyph)
-        {
-
-            Icon.FontFamily = new FontFamily("Segoe MDL2 Assets");
-            Icon.Glyph = glyph;
-
-        }
 
         private void InitializePoints()
         {
@@ -202,6 +185,9 @@ namespace Yatzy
                     "Kåk", "Chans", "Yatzy", "Totalpoäng:"
                 }.Select(name =>  new PointsClass(name, 0))
             );
+            _summa = Points.Where(x => x.Name == "Summa:").FirstOrDefault();
+            _bonus = Points.Where(x => x.Name == "Bonus").FirstOrDefault();
+            _total = Points.Where(x => x.Name == "Totalpoäng:").FirstOrDefault();
         }
 
         private void Reset()
@@ -321,10 +307,10 @@ namespace Yatzy
         {
             if (!_hasaddednonus)
             {
-                if (Points?[6].Point >= 63)
+                if (_summa.Point >= 63)
                 {
-                    Points[7].Point = 50;
-                    Points[19].Point += Points[7].Point;
+                    _bonus.Point = 50;
+                    _total.Point += _bonus.Point;
                     _hasaddednonus = true;
 
                 }
@@ -341,13 +327,13 @@ namespace Yatzy
                     }
                     if (Points.Take(6).Any(x => !x.HasPoints))
                     {
-                        Points[7].Point = difference;
-                        Points[7].FontColor = Points[7].Point < 0 ? Brushes.Red : Brushes.Green;
+                        _bonus.Point = difference;
+                        _bonus.FontColor = _bonus.Point < 0 ? Brushes.Red : Brushes.Green;
                     }
                     else
                     {
-                        Points[7].Point = 0;
-                        Points[7].FontColor = Brushes.Red;
+                        _bonus.Point = 0;
+                        _bonus.FontColor = Brushes.Red;
                     }
                 }
             }
@@ -435,7 +421,7 @@ namespace Yatzy
                 };
             } else
             {
-                MessageBox.Show("Du har inte den kombinationen");
+                MessageBox.Show("Du kan inte välja den kombinationen. \nDu har antingen inte kombinationen eller så har du redan valt den.");
                 return false;
             }
             
@@ -455,8 +441,8 @@ namespace Yatzy
             Points[pos].Font = FontWeights.Bold; 
             Points[pos].Point = Dices.Sum(x => x.DiceValue == värde ? värde : 0); 
            
-            Points.Where(x => x.Name == "Summa:").FirstOrDefault().Point += Points[pos].Point; 
-            Points.Where(x => x.Name == "Totalpoäng:").FirstOrDefault().Point += Points[pos].Point;
+            _summa.Point += Points[pos].Point; 
+            _total.Point += Points[pos].Point;
             Points[pos].HasPoints = true;
             Val.Remove(combo);
         }
@@ -465,21 +451,21 @@ namespace Yatzy
         {
             bool result = combo switch
             {
-                "Ettor" => true,
-                "Tvåor" => true,
-                "Treor" => true,
-                "Fyror" => true,
-                "Femmor" => true,
-                "Sexor" => true,
-                "Ett par" => Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 2).Count() > 0,
-                "Två par" => Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 2).Count() > 1,
-                "Triss" => Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 3).Count() > 0,
-                "Fyrtal" => Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 4).Count() > 0,
-                "Liten Stege" => Dices.Select(x => x.DiceValue).OrderBy(value => value).SequenceEqual(new[] { 1, 2, 3, 4, 5 }),
-                "Stor Stege" => Dices.Select(x => x.DiceValue).OrderBy(value => value).SequenceEqual(new[] { 2, 3, 4, 5, 6 }),
-                "Kåk" => Dices.GroupBy(x => x.DiceValue).Any(group => group.Count() == 2) && Dices.GroupBy(x => x.DiceValue).Any(group => group.Count() == 3),
-                "Chans" => true,
-                "Yatzy" => Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() == 5).Count() > 0,
+                "Ettor" => Val.Contains(combo),
+                "Tvåor" => Val.Contains(combo),
+                "Treor" => Val.Contains(combo),
+                "Fyror" => Val.Contains(combo),
+                "Femmor" => Val.Contains(combo),
+                "Sexor" => Val.Contains(combo),
+                "Ett par" => Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 2).Count() > 0 && Val.Contains(combo),
+                "Två par" => Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 2).Count() > 1 && Val.Contains(combo),
+                "Triss" => Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 3).Count() > 0 && Val.Contains(combo),
+                "Fyrtal" => Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() >= 4).Count() > 0 && Val.Contains(combo),
+                "Liten Stege" => Dices.Select(x => x.DiceValue).OrderBy(value => value).SequenceEqual(new[] { 1, 2, 3, 4, 5 }) && Val.Contains(combo),
+                "Stor Stege" => Dices.Select(x => x.DiceValue).OrderBy(value => value).SequenceEqual(new[] { 2, 3, 4, 5, 6 }) && Val.Contains(combo),
+                "Kåk" => Dices.GroupBy(x => x.DiceValue).Any(group => group.Count() == 2) && Dices.GroupBy(x => x.DiceValue).Any(group => group.Count() == 3) && Val.Contains(combo),
+                "Chans" =>  Val.Contains(combo),
+                "Yatzy" => Dices.GroupBy(x => x.DiceValue).Where(group => group.Count() == 5).Count() > 0 && Val.Contains(combo),
                 _ => false
             };
             return result;
@@ -533,19 +519,17 @@ namespace Yatzy
 
         private void CheckHighscore()
         {
-            if (Points[17].Point > Topscorer.Min(x => x.Score))
+            if (_total.Point > Topscorer.Min(x => x.Score) || Topscorer.Count < 10)
             {
-                HighScore s = Topscorer.SingleOrDefault(x => x.IsLast);
+                HighScore s = Topscorer.FirstOrDefault(x => x.IsLast);
                 s.IsLast = false;
                 s.FontColor = Brushes.Black;
+
             }
             Topscorer = new ObservableCollection<HighScore>(
-                Topscorer.Append(new HighScore(Points[19].Point) { FontColor = Brushes.Green, IsLast = true })
+                Topscorer.Append(new HighScore(_total.Point) { FontColor = Brushes.Green, IsLast = true })
                 .OrderByDescending(x => x.Score).Take(10)
             ); 
-            //Topscorer.Add(new HighScore(Points[19].Point) { IsLast = true });
-            //Topscorer = new ObservableCollection<HighScore>(Topscorer.OrderByDescending(x => x.Score));
-            //Topscorer = new ObservableCollection<HighScore>(Topscorer.Take(10));
             AddIndex();
             Save();
 
