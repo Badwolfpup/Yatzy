@@ -1,4 +1,5 @@
-﻿using MahApps.Metro.Controls;
+﻿using ControlzEx.Standard;
+using MahApps.Metro.Controls;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -275,6 +276,8 @@ namespace Yatzy
 
         private void Crossout(string combo)
         {
+            if (combo == "Ettor" || combo == "Tvåor" || combo == "Treor" || combo == "Fyror" || combo == "Femmor" || combo == "Sexor") return;
+            if (!Val.Contains(combo)) return;
             PointsClass? p = Points?.Where(x => x.Name == combo).FirstOrDefault();
             if (p != null)
             {
@@ -331,7 +334,7 @@ namespace Yatzy
             {
                 PointsClass? point = Points.Where(x => x.Name == combo).FirstOrDefault();
                 PointsClass? total = Points.Where(x => x.Name == "Totalpoäng:").ToList().FirstOrDefault();
-
+                if (point == null || total == null) return false;
                 switch (combo)
                 {
                     case "Ettor": { SelectNumber(1, 0, combo); return true; }
@@ -463,8 +466,11 @@ namespace Yatzy
             if (_total.Point > Topscorer?.Min(x => x.Score) || Topscorer.Count < 10)
             {
                 HighScore? s = Topscorer.FirstOrDefault(x => x.IsLast);
-                s.IsLast = false;
-                s.FontColor = Brushes.Black;
+                if (s != null)
+                {
+                    s.IsLast = false;
+                    s.FontColor = Brushes.Black;
+                }
 
             }
             Topscorer = new ObservableCollection<HighScore>(
@@ -525,7 +531,28 @@ namespace Yatzy
             return JsonConvert.DeserializeObject<ObservableCollection<HighScore>>(file);
         }
 
+        private void TextBlock_MouseDown_1(object sender, MouseButtonEventArgs e)
+        { 
+            MessageBoxResult result = MessageBox.Show("Vill du verkligen radera highscore?", "Radera highscore", MessageBoxButton.YesNo);
+            if (result == MessageBoxResult.Yes)
+            {
+                Topscorer = new ObservableCollection<HighScore>();
+                Save();
+            }
+        }
 
+        private void TextBlock_MouseDown_2(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is TextBlock text)
+            {
+                if (text.DataContext is HighScore highScore)
+                {
+                    Topscorer.Remove(highScore);
+                    AddIndex();
+                    Save();
+                }
+            }
+        }
     }
 
     public class SignConverter : IMultiValueConverter

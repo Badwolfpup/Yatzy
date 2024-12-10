@@ -102,17 +102,26 @@
         </ItemsControl>
 
         <StackPanel Grid.Column="1" Grid.RowSpan="2">
-            <TextBlock FontSize="16" FontFamily="Roboto" FontWeight="Bold" Margin="0 20 0 10 " HorizontalAlignment="Center" Text="Highscore"></TextBlock>
+            <StackPanel Orientation="Horizontal" Margin="0 20 0 10 " HorizontalAlignment="Center">
+                <TextBlock FontSize="16" FontFamily="Roboto" FontWeight="Bold"  HorizontalAlignment="Center" Text="Highscore" VerticalAlignment="Center"></TextBlock>
+                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE894;" Foreground="Red" FontSize="24" Margin="10 0 0 0 " MouseDown="TextBlock_MouseDown_1"></TextBlock>
+                
+            </StackPanel>
             <ItemsControl ItemsSource="{Binding Topscorer}">
 
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
                         <TextBlock FontFamily="Roboto" FontSize="16" Foreground="{Binding FontColor}">
                             <Run Text="{Binding Index, Converter={StaticResource AddSpaceConverter}}"></Run>
 
                             <Run Text="{Binding Datum}"></Run>
                             <Run Text="{Binding Score}"></Run>
+
                         </TextBlock>
+                            <TextBlock FontFamily="Segoe MDL2 Assets" FontWeight="Bold" Text="&#xE894;" Foreground="Red" Margin="10 0 0 0 " MouseDown="TextBlock_MouseDown_2"></TextBlock>
+
+                        </StackPanel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

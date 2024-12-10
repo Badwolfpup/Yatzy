@@ -15,8 +15,15 @@ namespace Yatzy
         }
         #endregion
 
-        public string Name { get; set; }
+        #region Private Fields
         private int? _point;
+        private FontWeight _font = FontWeights.Normal;
+        private Brush _fontcolor = Brushes.Black;
+        private TextDecorationCollection? _overstruken;
+        private bool _hasPoints = false;
+        #endregion
+
+        #region Public INotifyPropertyChanged   
         public int? Point
         {
             get => _point;
@@ -29,7 +36,6 @@ namespace Yatzy
                 }
             }
         }
-        private FontWeight _font = FontWeights.Normal;
         public FontWeight Font
         {
             get => _font;
@@ -42,8 +48,6 @@ namespace Yatzy
                 }
             }
         }
-
-        private Brush _fontcolor = Brushes.Black;
         public Brush FontColor
         {
             get => _fontcolor;
@@ -56,7 +60,6 @@ namespace Yatzy
                 }
             }
         }
-        private TextDecorationCollection? _overstruken;
         public TextDecorationCollection? Overstruken
         {
             get => _overstruken;
@@ -69,9 +72,6 @@ namespace Yatzy
                 }
             }
         }
-
-        private bool _hasPoints = false;
-
         public bool HasPoints
         {
             get => _hasPoints;
@@ -84,6 +84,9 @@ namespace Yatzy
                 }
             }
         }
+        #endregion
+
+        public string Name { get; set; }
 
         public PointsClass(string name, int point)
         {
