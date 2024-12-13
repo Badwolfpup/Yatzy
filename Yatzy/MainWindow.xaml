@@ -7,10 +7,11 @@
         xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:local="clr-namespace:Yatzy"
         mc:Ignorable="d"
-        Title="Yatzy" Height="340" Width="700" >
+        Title="Yatzy" Height="340" Width="700" KeyDown="MetroWindow_KeyDown">
     <mah:MetroWindow.Resources>
         <local:SignConverter x:Key="SignConverter"/>
         <local:AddSpaceConverter x:Key="AddSpaceConverter"/>
+        
     </mah:MetroWindow.Resources>       
     <Grid Margin="20">
 

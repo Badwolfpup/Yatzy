@@ -178,6 +178,7 @@ namespace Yatzy
 
         private void Reset()
         {
+            Val.Clear();
             foreach (var item in ValOriginal)
             {
                 Val.Add(item);
@@ -194,6 +195,7 @@ namespace Yatzy
             if (_newgame)
             {
                 Reset();
+                _numberofrolls = 3;
                 _newgame = false;
             }
             if (Val.Count == 0 && !_newgame)
@@ -551,6 +553,15 @@ namespace Yatzy
                     AddIndex();
                     Save();
                 }
+            }
+        }
+
+        private void MetroWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.S)
+            {
+                _newgame = true;
+                RollDices();
             }
         }
     }
