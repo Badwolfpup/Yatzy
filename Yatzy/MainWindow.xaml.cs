@@ -18,6 +18,22 @@ namespace Yatzy
     /// </summary>
     public partial class MainWindow : MetroWindow, INotifyPropertyChanged
     {
+        public MainWindow(YatzyLobby lobby)
+        {
+            InitializeComponent();
+            _lobby = lobby;
+            Dices = new ObservableCollection<Dice>();
+            DataContext = this;
+            Topscorer = Load();
+            AddIndex();
+            InitializePoints();
+            Closing += Windows_Closing;
+        }
+
+
+
+
+        #region Properties
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -26,6 +42,8 @@ namespace Yatzy
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         #endregion
+
+        private readonly YatzyLobby _lobby;
 
         private ObservableCollection<HighScore>? _topscorer;
         public ObservableCollection<HighScore>? Topscorer
@@ -150,16 +168,21 @@ namespace Yatzy
         private PointsClass? _summa;
         private PointsClass? _bonus;
 
-        public MainWindow()
-        {
-            InitializeComponent();
-            Dices = new ObservableCollection<Dice>();
-            DataContext = this;
-            Topscorer = Load();
-            AddIndex();
-            InitializePoints();
-        }
+        #endregion
 
+
+        private void Windows_Closing(object? sender, CancelEventArgs e)
+        {
+            foreach (Window window in Application.Current.Windows)
+            {
+                if (window != this)
+                {
+                    window.Close();
+                }
+            }
+
+            Application.Current.Shutdown();
+        }
 
         private void InitializePoints()
         {
@@ -563,6 +586,12 @@ namespace Yatzy
                 _newgame = true;
                 RollDices();
             }
+        }
+
+        private void Return_Lobby_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+            _lobby.Show();
         }
     }
 

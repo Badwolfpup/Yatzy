@@ -16,6 +16,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using System.Diagnostics;
+using System.Windows.Controls.Primitives;
+using System.Windows.Threading;
 
 namespace Yatzy
 {
@@ -24,8 +27,10 @@ namespace Yatzy
     /// </summary>
     public partial class YatzyLobby : Window, INotifyPropertyChanged
     {
-        private readonly HubConnection _connection;
-        private readonly string _username;
+        private  HubConnection _connection;
+        private string _username = "";
+        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        CancellationToken cancellationToken; 
         public ObservableCollection<Player> Players { get; } = new ObservableCollection<Player>();
 
         public ObservableCollection<ChatMessage> ChatMessages { get; } = new ObservableCollection<ChatMessage>();
@@ -36,6 +41,32 @@ namespace Yatzy
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        private int _connectionattempts = 0;
+
+        private bool _isconnected;
+        public bool IsConnected
+        {
+            get { return _isconnected; }
+            set
+            {
+                _isconnected = value;
+                OnPropertyChanged(nameof(IsConnected));
+            }
+        }
+
+        private bool _enableSinglePlayerButton;
+
+        public bool EnableSinglePlayerButton
+        {
+            get { return _enableSinglePlayerButton; }
+            set
+            {
+                _enableSinglePlayerButton = value;
+                OnPropertyChanged(nameof(EnableSinglePlayerButton));
+            }
+        }
+
 
         private string _newmessage;
         public string NewMessage
@@ -52,9 +83,67 @@ namespace Yatzy
         {
             InitializeComponent();
             DataContext = this;
-            _connection = new HubConnectionBuilder()
-                .WithUrl("http://193.181.23.229:50001/lobbyHub")
-                .Build();
+            //OpenNickName();
+            Loaded += async (s, e) => await OpenNickName();
+
+            // Task.Run(async () => await _popupclosed.Task).GetAwaiter().GetResult();
+            //_connection = new HubConnectionBuilder()
+            //        .WithUrl("http://193.181.23.229:50001/lobbyHub")
+            //        .Build();
+
+            //// Handle connection closed event for reconnection
+            //_connection.Closed += async (error) =>
+            //{
+            //    Dispatcher.Invoke(() =>
+            //    {
+            //        ChatMessages.Add(new ChatMessage
+            //        {
+            //            Sender = "System",
+            //            Message = error != null ? $"Connection lost: {error.Message}" : "Connection closed"
+            //        });
+            //    });
+            //    await Task.Delay(5000); // Retry after 5 seconds
+            //    await TryConnectAsync();
+            //};
+
+            //_connection.On<string>("PlayerJoined", (username) =>
+            //{
+            //    Dispatcher.Invoke(() =>
+            //    {
+            //        ChatMessages.Add(new ChatMessage { Sender = "System", Message = $"{username} joined the lobby!" });
+            //    });
+            //});
+
+            //_connection.On<object[]>("UpdatePlayerList", (playerlist) =>
+            //{
+            //    Dispatcher.Invoke(() =>
+            //    {
+            //        Players.Clear();
+            //        foreach(var item in playerlist)
+            //        {
+            //            var player = JsonConvert.DeserializeObject<Player>(item.ToString());
+            //            Players.Add(player);
+            //        }
+            //    });
+            //});
+
+            //_connection.On<string, string>("ReceiveMessage", (sender, message) =>
+            //{
+            //    Dispatcher.Invoke(() =>
+            //    {
+            //        ChatMessages.Add(new ChatMessage { Sender = sender, Message = message });
+            //    });
+            //});
+
+
+            //Task.Run(() => TryConnectAsync());
+        }
+
+        private async Task OpenConnection()
+        {
+           _connection = new HubConnectionBuilder()
+         .WithUrl("http://193.181.23.229:50001/lobbyHub")
+         .Build();
 
             // Handle connection closed event for reconnection
             _connection.Closed += async (error) =>
@@ -84,7 +173,7 @@ namespace Yatzy
                 Dispatcher.Invoke(() =>
                 {
                     Players.Clear();
-                    foreach(var item in playerlist)
+                    foreach (var item in playerlist)
                     {
                         var player = JsonConvert.DeserializeObject<Player>(item.ToString());
                         Players.Add(player);
@@ -99,16 +188,45 @@ namespace Yatzy
                     ChatMessages.Add(new ChatMessage { Sender = sender, Message = message });
                 });
             });
-
-            _username = "Player" + new Random().Next(1000, 9999);
-
             Task.Run(() => TryConnectAsync());
+
         }
 
+        private async Task OpenNickName()
+        {
+            NickName popup = new NickName
+            {
+                Owner = this,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner
+            };
+
+            bool? result = popup.ShowDialog();
+            _username = popup.NickNameText != "" ? popup.NickNameText : "Player" + new Random().Next(1000, 9999);
+
+            OpenConnection();
+        }
         private async Task TryConnectAsync()
         {
-            while (_connection.State == HubConnectionState.Disconnected)
+            cancellationToken = cancellationTokenSource.Token;
+            var retryUntil = DateTime.UtcNow.AddMinutes(1);
+            IsConnected = false;
+            while (_connection.State != HubConnectionState.Connected)
             {
+
+
+                if (DateTime.UtcNow > retryUntil)
+                {
+                    Dispatcher.Invoke(() => ChatMessages.Add(new ChatMessage { Sender = "System", Message = "Connection retry limit reached (1 minutes)." }));
+                    MessageBox.Show("Connection retry limit reached (1 minutes). You will only be able to play single player", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    EnableSinglePlayerButton = true;
+                    break;
+                }
+
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    Dispatcher.Invoke(() => ChatMessages.Add(new ChatMessage { Sender = "System", Message = "Connection attempt canceled." }));
+                    break;
+                }
                 try
                 {
                     Dispatcher.Invoke(() =>
@@ -116,29 +234,126 @@ namespace Yatzy
                         ChatMessages.Add(new ChatMessage { Sender = "System", Message = "Attempting to connect..." });
                     });
 
-                    await _connection.StartAsync();
-
-                    Dispatcher.Invoke(() =>
+                    try
                     {
-                        ChatMessages.Add(new ChatMessage { Sender = "System", Message = $"Connection established: {_connection.State}" });
-                    });
+                        var connectTask = _connection.StartAsync();
+                        if (await Task.WhenAny(connectTask, Task.Delay(19000, cancellationToken)) == connectTask)
+                        {
+                            await connectTask;
+                            Dispatcher.Invoke(() =>
+                            {
+                                ChatMessages.Add(new ChatMessage { Sender = "System", Message = $"Connection established: {_connection.State}" });
+                            });
 
-                    await _connection.InvokeAsync("JoinLobby", _username);
-                    break; // Exit loop on success
+                            await _connection.InvokeAsync("JoinLobby", _username, cancellationToken);
+
+                            IsConnected = true;
+                            EnableSinglePlayerButton = true;
+                            _ = MonitorConnection(); // Fire-and-forget
+                            break; // Exit loop on success
+                        }
+                        else
+                        {
+                            throw new TimeoutException("Connection attempt timed out.");
+                        }
+                    }
+                    catch (ObjectDisposedException) { } // Handle disposed token
+                    catch (OperationCanceledException ex) { }
+                    catch (Exception ex) 
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            _connectionattempts++;
+                            ChatMessages.Add(new ChatMessage { Sender = "System", Message = $"Connection failed ({_connectionattempts}): {ex.Message}" });
+                        });
+
+                        await Task.Delay(5000); // Retry after 5 seconds
+                    }
+
                 }
                 catch (Exception ex)
                 {
                     Dispatcher.Invoke(() =>
                     {
-                        ChatMessages.Add(new ChatMessage { Sender = "System", Message = $"Connection failed: {ex.Message}" });
+                        _connectionattempts++;
+                        ChatMessages.Add(new ChatMessage { Sender = "System", Message = $"Connection failed ({_connectionattempts}): {ex.Message}" });
                     });
+
                     await Task.Delay(5000); // Retry after 5 seconds
                 }
             }
         }
 
+        private async Task MonitorConnection()
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    await _connection.InvokeAsync("Ping", cancellationToken);
+                    Dispatcher.Invoke(() =>
+                    {
+                        IsConnected = _connection.State == HubConnectionState.Connected;
+                    });
+
+                }
+                catch (Exception ex)
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        IsConnected = false;
+                        ChatMessages.Add(new ChatMessage { Sender = "System", Message = $"Connection lost: {ex.Message}" });
+                        ChatMessages.Add(new ChatMessage { Sender = "System", Message = $"Attempting to reconnect..." });
+                    });
+
+                    // Attempt to reconnect
+                    try
+                    {
+                        await TryConnectAsync(); // Directly await
+                        if (_connection.State == HubConnectionState.Connected)
+                        {
+                            Dispatcher.Invoke(() =>
+                            {
+                                ChatMessages.Add(new ChatMessage { Sender = "System", Message = "Reconnected successfully." });
+                            });
+                        }
+                    }
+                    catch (Exception reconEx)
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            ChatMessages.Add(new ChatMessage { Sender = "System", Message = $"Reconnection failed: {reconEx.Message}" });
+                        });
+                    }
+
+                    // Wait before next ping/reconnect attempt
+                    try
+                    {
+                        await Task.Delay(10000, cancellationToken);
+                    }
+                    catch (OperationCanceledException) { break; }
+                    catch (ObjectDisposedException) { break; }
+                    continue; // Continue monitoring loop
+                }
+            }
+
+        }
+        protected override async void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            cancellationTokenSource.Cancel(); // Cancel any running tasks
+            try
+            {
+                await _connection.StopAsync(); // Gracefully stop the connection
+                await _connection.DisposeAsync(); // Dispose connection asynchronously
+            }
+            catch { }
+            cancellationTokenSource.Dispose(); // Dispose cancellation token
+        }
+
         private async void SendMessage_Click(object sender, RoutedEventArgs e)
         {
+
             if (!string.IsNullOrEmpty(NewMessage))
             {
                 await _connection.InvokeAsync("SendMessage", NewMessage);
@@ -146,9 +361,42 @@ namespace Yatzy
             }
         }
 
-        private void StartGame_Click_1(object sender, RoutedEventArgs e)
+        private void Start_SinglePlayer_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Start Game not implemented yet.");
+            var mainwindow = new MainWindow(this);
+            //Application.Current.MainWindow = mainwindow;
+            mainwindow.Show();
+            cancellationTokenSource.Cancel();
+            Hide();
+        }
+
+        private void Invite_Player_Click(object sender, RoutedEventArgs e)
+        {
+            MultiPlayerPopUp.IsOpen = false;
+        }
+
+        private void Random_opponent_Click(object sender, RoutedEventArgs e)
+        {
+            MultiPlayerPopUp.IsOpen = false;
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                SendMessage_Click(sender, e);
+            }
+        }
+
+        private void ShowToolTip_Click(object sender, RoutedEventArgs e)
+        {
+            MultiPlayerPopUp.IsOpen = true;
+            //Dispatcher.BeginInvoke(new Action(() =>
+            //{
+            //    double targetWidth = MultiPlayerButton.ActualWidth;
+            //    double popupWidth = MultiPlayerPopUp.ActualWidth;
+            //    MultiPlayerPopUp.HorizontalOffset = (targetWidth - popupWidth) / 2;
+            //}), DispatcherPriority.Loaded);
         }
     }
 

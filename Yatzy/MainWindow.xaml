@@ -7,7 +7,7 @@
         xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:local="clr-namespace:Yatzy"
         mc:Ignorable="d"
-        Title="Yatzy" Height="340" Width="700" KeyDown="MetroWindow_KeyDown">
+        Title="Yatzy" Height="600" Width="800" KeyDown="MetroWindow_KeyDown" WindowStartupLocation="CenterScreen">
     <mah:MetroWindow.Resources>
         <local:SignConverter x:Key="SignConverter"/>
         <local:AddSpaceConverter x:Key="AddSpaceConverter"/>
@@ -56,11 +56,6 @@
         
         <ItemsControl ItemsSource="{Binding Points}" Grid.Row="1">
 
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Vertical"></WrapPanel>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Grid>
@@ -85,10 +80,13 @@
                         </Grid.Resources>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="100"></ColumnDefinition>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="auto"></ColumnDefinition>
+                            <ColumnDefinition Width="auto"></ColumnDefinition>
+                            <ColumnDefinition Width="auto"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="{Binding Name}" MouseRightButtonDown="TextBlock_MouseRightButtonDown" MouseLeftButtonDown="TextBlock_MouseDown" FontWeight="{Binding Font}" TextDecorations="{Binding Overstruken}" Style="{StaticResource strikethrough}" Foreground="{Binding FontColor}"></TextBlock>
-                        <TextBlock Margin="10 0 10 0" Grid.Column="1"   FontWeight="{Binding Font}" TextDecorations="{Binding Overstruken}" Style="{StaticResource strikethrough}" Foreground="{Binding FontColor}">
+                        <Button Grid.Column="1" Width="20" Height="20" FontFamily="Segoe MDL2 Assets" Content="&#xE948;"></Button>
+                        <TextBlock Margin="10 0 10 0" Grid.Column="2" FontWeight="{Binding Font}" TextDecorations="{Binding Overstruken}" Style="{StaticResource strikethrough}" Foreground="{Binding FontColor}">
                             <TextBlock.Text>
                                 <MultiBinding Converter="{StaticResource SignConverter}">
                                     <Binding Path="Name" />
@@ -97,6 +95,7 @@
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
+                        <Button Grid.Column="3" Width="20" Height="20" FontFamily="Segoe MDL2 Assets" Content="&#xE949;"></Button>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
@@ -126,6 +125,7 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+            <Button Margin="0 20 0 0" Content="Return to lobby" Click="Return_Lobby_Click" Width="100" Height="30" HorizontalAlignment="Center"></Button>
         </StackPanel>
 
     </Grid>
