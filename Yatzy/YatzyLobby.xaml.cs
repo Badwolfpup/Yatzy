@@ -438,10 +438,10 @@ namespace Yatzy
         private void Random_opponent_Click(object sender, RoutedEventArgs e)
         {
             _connection.InvokeAsync("QueueForGame");
-            var queueing = new Queueing(this);
-            queueing.Owner = this;
-            queueing.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            queueing.ShowDialog();
+            //var queueing = new Queueing(this);
+            //queueing.Owner = this;
+            //queueing.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            //queueing.ShowDialog();
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
