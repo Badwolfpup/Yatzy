@@ -19,6 +19,7 @@ using Newtonsoft.Json.Serialization;
 using System.Diagnostics;
 using System.Windows.Controls.Primitives;
 using System.Windows.Threading;
+using System.Net.Sockets;
 
 namespace Yatzy
 {
@@ -69,6 +70,8 @@ namespace Yatzy
 
 
         private string _newmessage;
+        public bool InQueue = true;
+
         public string NewMessage
         {
             get { return _newmessage; }
@@ -85,7 +88,7 @@ namespace Yatzy
             DataContext = this;
             //OpenNickName();
             Loaded += async (s, e) => await OpenNickName();
-
+            Closing += YatzyLobby_Closing;
             // Task.Run(async () => await _popupclosed.Task).GetAwaiter().GetResult();
             //_connection = new HubConnectionBuilder()
             //        .WithUrl("http://193.181.23.229:50001/lobbyHub")
@@ -139,6 +142,29 @@ namespace Yatzy
             //Task.Run(() => TryConnectAsync());
         }
 
+        public async void YatzyLobby_Closing(object? sender, CancelEventArgs e)
+        {
+            cancellationTokenSource?.Cancel();
+
+            try
+            {
+                if (_connection != null)
+                {
+                    await _connection.StopAsync();       // Await to ensure graceful shutdown
+                    await _connection.DisposeAsync();    // Dispose asynchronously
+                }
+            }
+            catch (Exception ex)
+            {
+                // Optional: log or handle error
+            }
+            finally
+            {
+                cancellationTokenSource?.Dispose();
+            }
+
+        }
+
         private async Task OpenConnection()
         {
            _connection = new HubConnectionBuilder()
@@ -187,6 +213,21 @@ namespace Yatzy
                 {
                     ChatMessages.Add(new ChatMessage { Sender = sender, Message = message });
                 });
+            });
+
+            _connection.On<string, string>("GameStarted", (player1, player2) => {
+                Dispatcher.Invoke(() =>
+                 {
+                     var mainwindow = new MainWindow(this, new ObservableCollection<Player>
+                     {
+                        Players.FirstOrDefault(p => p.UserName == player1),
+                        Players.FirstOrDefault(p => p.UserName == player2)
+                     });
+                     InQueue = false;
+                     mainwindow.Show();
+                     cancellationTokenSource.Cancel();
+                     Hide();
+                 });
             });
             Task.Run(() => TryConnectAsync());
 
@@ -338,18 +379,33 @@ namespace Yatzy
             }
 
         }
-        protected override async void OnClosing(CancelEventArgs e)
+
+        public async Task LeaveQueue()
         {
-            base.OnClosing(e);
-            cancellationTokenSource.Cancel(); // Cancel any running tasks
             try
             {
-                await _connection.StopAsync(); // Gracefully stop the connection
-                await _connection.DisposeAsync(); // Dispose connection asynchronously
+                await _connection.InvokeAsync("LeaveQueue");
             }
-            catch { }
-            cancellationTokenSource.Dispose(); // Dispose cancellation token
+            catch (Exception ex)
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    ChatMessages.Add(new ChatMessage { Sender = "System", Message = $"Error leaving queue: {ex.Message}" });
+                });
+            }
         }
+        //protected override async void OnClosing(CancelEventArgs e)
+        //{
+        //    base.OnClosing(e);
+        //    cancellationTokenSource.Cancel(); // Cancel any running tasks
+        //    try
+        //    {
+        //        await _connection.StopAsync(); // Gracefully stop the connection
+        //        await _connection.DisposeAsync(); // Dispose connection asynchronously
+        //    }
+        //    catch { }
+        //    cancellationTokenSource.Dispose(); // Dispose cancellation token
+        //}
 
         private async void SendMessage_Click(object sender, RoutedEventArgs e)
         {
@@ -363,21 +419,29 @@ namespace Yatzy
 
         private void Start_SinglePlayer_Click(object sender, RoutedEventArgs e)
         {
-            var mainwindow = new MainWindow(this);
-            //Application.Current.MainWindow = mainwindow;
+            var player = new ObservableCollection<Player>
+            { 
+                Players.FirstOrDefault(p => p.UserName == _username)
+            };
+            var mainwindow = new MainWindow(this, player);
             mainwindow.Show();
             cancellationTokenSource.Cancel();
             Hide();
         }
 
+
+
         private void Invite_Player_Click(object sender, RoutedEventArgs e)
         {
-            MultiPlayerPopUp.IsOpen = false;
         }
 
         private void Random_opponent_Click(object sender, RoutedEventArgs e)
         {
-            MultiPlayerPopUp.IsOpen = false;
+            _connection.InvokeAsync("QueueForGame");
+            var queueing = new Queueing(this);
+            queueing.Owner = this;
+            queueing.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            queueing.ShowDialog();
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
@@ -390,7 +454,6 @@ namespace Yatzy
 
         private void ShowToolTip_Click(object sender, RoutedEventArgs e)
         {
-            MultiPlayerPopUp.IsOpen = true;
             //Dispatcher.BeginInvoke(new Action(() =>
             //{
             //    double targetWidth = MultiPlayerButton.ActualWidth;

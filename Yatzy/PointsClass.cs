@@ -17,10 +17,13 @@ namespace Yatzy
 
         #region Private Fields
         private int? _point;
-        private FontWeight _font = FontWeights.Normal;
+        private FontWeight _font = FontWeights.Bold;
         private Brush _fontcolor = Brushes.Black;
-        private TextDecorationCollection? _overstruken;
         private bool _hasPoints = false;
+        private bool _leftbuttonenabled = false;
+        private bool _rightbuttonenabled = true;
+        private bool _canselect;
+        private SolidColorBrush _bakgrund = new SolidColorBrush(Colors.AntiqueWhite);
         #endregion
 
         #region Public INotifyPropertyChanged   
@@ -60,18 +63,6 @@ namespace Yatzy
                 }
             }
         }
-        public TextDecorationCollection? Overstruken
-        {
-            get => _overstruken;
-            set
-            {
-                if (_overstruken != value)
-                {
-                    _overstruken = value;
-                    OnPropertyChanged(nameof(Overstruken));
-                }
-            }
-        }
         public bool HasPoints
         {
             get => _hasPoints;
@@ -81,6 +72,55 @@ namespace Yatzy
                 {
                     _hasPoints = value;
                     OnPropertyChanged(nameof(HasPoints));
+                }
+            }
+        }
+        public bool LeftButtonEnabled
+        {
+            get => _leftbuttonenabled;
+            set
+            {
+                if (_leftbuttonenabled != value)
+                {
+                    _leftbuttonenabled = value;
+                    OnPropertyChanged(nameof(LeftButtonEnabled));
+                }
+            }
+        }
+        public bool RightButtonEnabled
+        {
+            get => _rightbuttonenabled;
+            set
+            {
+                if (_rightbuttonenabled != value)
+                {
+                    _rightbuttonenabled = value;
+                    OnPropertyChanged(nameof(RightButtonEnabled));
+                }
+            }
+        }
+        public bool CanSelect
+        {
+            get => _canselect;
+            set
+            {
+                if (_canselect != value)
+                {
+                    _canselect = value;
+                    OnPropertyChanged(nameof(CanSelect));
+                }
+            }
+        }
+        public bool ShowButton { get; set; } = true;
+        public SolidColorBrush BakGrund
+        {
+            get => _bakgrund;
+            set
+            {
+                if (_bakgrund != value)
+                {
+                    _bakgrund = value;
+                    OnPropertyChanged(nameof(BakGrund));
                 }
             }
         }

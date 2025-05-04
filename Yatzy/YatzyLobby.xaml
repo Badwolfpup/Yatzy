@@ -58,19 +58,9 @@
 
             <!-- Send and Start Game Buttons -->
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left">
-                <Button x:Name="SinglePlayerButton" Content="Single Player" Width="100" Margin="5" Click="Start_SinglePlayer_Click" IsEnabled="{Binding EnableSinglePlayerButton}"/>
-                <Grid>
-                    <Button x:Name="MultiPlayerButton" Content="Multi Player" Width="100" Margin="5" IsEnabled="{Binding IsConnected}" Click="ShowToolTip_Click" />
-                    <Popup StaysOpen="False" PlacementTarget="{Binding ElementName=MultiPlayerButton}" x:Name="MultiPlayerPopUp"
-                           Placement="Top" PopupAnimation="Slide" AllowsTransparency="True">
-                        <Border Background="White" BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="10">
-                            <StackPanel>
-                                <Button x:Name="InvitePlayer" Content="Invite opponent" Width="100" Height="30" Click="Invite_Player_Click"></Button>
-                                <Button x:Name="RandomOpponent" Content="Random opponent" Width="100" Height="30" Click="Random_opponent_Click"></Button> 
-                            </StackPanel>
-                        </Border>
-                     </Popup>
-                </Grid>
+                <Button x:Name="SinglePlayerButton" Content="Single Player" Width="120" Margin="5" Click="Start_SinglePlayer_Click" IsEnabled="{Binding EnableSinglePlayerButton}"/>
+                <Button x:Name="InvitePlayer" Content="Invite opponent" Width="120" Height="30" Margin="5" Click="Invite_Player_Click" IsEnabled="{Binding IsConnected}"></Button>
+                <Button x:Name="RandomOpponent" Content="Random opponent" Width="120" Height="30" Margin="5" Click="Random_opponent_Click" IsEnabled="{Binding IsConnected}"></Button>
 
             </StackPanel>
             <Button Grid.Row="2" HorizontalAlignment="Right" Content="Send" Width="100" Margin="5" Click="SendMessage_Click" IsEnabled="{Binding IsConnected}"/>
