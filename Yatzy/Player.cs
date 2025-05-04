@@ -57,6 +57,9 @@ namespace Yatzy
             }
         }
 
+        public int[] RolledDices { get; set; } = new int[5];
+        public bool[] IsDiceSaved { get; set; } = new bool[5];
+
         private bool _outofrolls = true;
         public bool OutofRolls
         {
@@ -81,6 +84,35 @@ namespace Yatzy
                 {
                     _startbutton = value;
                     OnPropertyChanged(nameof(StartButton));
+                }
+            }
+        }
+
+        private bool _myturn;
+        public bool MyTurn
+        {
+            get => _myturn;
+            set
+            {
+                if (_myturn != value)
+                {
+                    _myturn = value;
+                    BorderBrush = _myturn ? Brushes.Red : Brushes.Black;
+                    OnPropertyChanged(nameof(MyTurn));
+                }
+            }
+        }
+
+        private Brush _borderbrush = Brushes.Black;
+        public Brush BorderBrush
+        {
+            get => _borderbrush;
+            set
+            {
+                if (_borderbrush != value)
+                {
+                    _borderbrush = value;
+                    OnPropertyChanged(nameof(BorderBrush));
                 }
             }
         }

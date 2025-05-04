@@ -30,6 +30,7 @@ namespace Yatzy
     {
         private  HubConnection _connection;
         private string _username = "";
+        private MainWindow _mainWindow;
         CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         CancellationToken cancellationToken; 
         public ObservableCollection<Player> Players { get; } = new ObservableCollection<Player>();
@@ -167,10 +168,12 @@ namespace Yatzy
 
         private async Task OpenConnection()
         {
-           _connection = new HubConnectionBuilder()
-         .WithUrl("http://193.181.23.229:50001/lobbyHub")
-         .Build();
-
+            //  _connection = new HubConnectionBuilder()
+            //.WithUrl("http://193.181.23.229:50001/lobbyHub")
+            //.Build();
+            _connection = new HubConnectionBuilder()
+           .WithUrl("http://localhost:5000/lobbyHub")
+           .Build();
             // Handle connection closed event for reconnection
             _connection.Closed += async (error) =>
             {
@@ -229,8 +232,22 @@ namespace Yatzy
                      Hide();
                  });
             });
+
+            _connection.On<int[], bool[]>("UpdateDice", (number, saved) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    _mainWindow.UnPackDices(number, saved);
+                });
+            });
+
             Task.Run(() => TryConnectAsync());
 
+        }
+
+        public async Task UpdateDice(int[] nums, bool[] saves)
+        {
+            _connection.InvokeAsync("UpdateDice", nums, saves);
         }
 
         private async Task OpenNickName()
@@ -423,8 +440,8 @@ namespace Yatzy
             { 
                 Players.FirstOrDefault(p => p.UserName == _username)
             };
-            var mainwindow = new MainWindow(this, player);
-            mainwindow.Show();
+            _mainWindow = new MainWindow(this, player);
+            _mainWindow.Show();
             cancellationTokenSource.Cancel();
             Hide();
         }

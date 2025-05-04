@@ -12,10 +12,9 @@ namespace Yatzy
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         #endregion
-        public Dice(int dicevalue)
+        public Dice()
         {
-            DiceValue = dicevalue;
-            SetSource();
+
         }
 
         private void SetSource()
@@ -23,9 +22,10 @@ namespace Yatzy
             ImageSource = $"pack://application:,,,/Images/dice{DiceValue}.png";
         }
 
-        public void UpdateDice(int dice)
+        public void UpdateDice(int dice, bool saved)
         {
             DiceValue = dice;
+            Issaved = saved;
             SetSource();
         }
 

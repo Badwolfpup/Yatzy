@@ -119,8 +119,10 @@ namespace Yatzy
                 _activeplayer.Started = true;
                 for (int i = 0; i < 5; i++)
                 {
-                    _activeplayer.Dices.Add(new Dice(random.Next(1, 7)));
+                    _activeplayer.RolledDices[i] = random.Next(1, 7);
+                    //_activeplayer.Dices.Add(new Dice());
                 }
+                _lobby.UpdateDice(_activeplayer.RolledDices, _activeplayer.IsDiceSaved);
                 CheckCombo();
             }
             else
@@ -131,17 +133,26 @@ namespace Yatzy
 
                 for (int i = 0; i < 5; i++)
                 {
-                    if (!_activeplayer.Dices[i].Issaved)
+                    if (!_activeplayer.IsDiceSaved[i])
                     {
-                        _activeplayer.Dices[i].UpdateDice(random.Next(1, 7));
+                        _activeplayer.RolledDices[i] = random.Next(1, 7);
+                        //_activeplayer.Dices[i].UpdateDice(random.Next(1, 7));
                     }
                 }
+                _lobby.UpdateDice(_activeplayer.RolledDices, _activeplayer.IsDiceSaved);
                 CheckCombo();
                 if (_activeplayer._numberofrolls <= 0) { _activeplayer.OutofRolls = false; return; }
             }
         }
 
-
+        public void UnPackDices(int[] nums, bool[] saves)
+        {
+            for (int i = 0; i < nums.Length; i++)
+            {
+                _activeplayer.Dices.Add(new Dice());
+                _activeplayer.Dices[i].UpdateDice(nums[i], saves[i]);
+            }
+        }
 
         private void LoadImageNumberOfRolls(int rolls)
         {
@@ -156,6 +167,9 @@ namespace Yatzy
 
         private void NewRound()
         {
+            _activeplayer.MyTurn = false;
+            _activeplayer = Players.IndexOf(_activeplayer) == 0 ? Players[1] : Players[0];
+            _activeplayer.MyTurn = true;
             _activeplayer.Started = false;
             _activeplayer.OutofRolls = true;
             _activeplayer._numberofrolls = 3;
@@ -168,15 +182,18 @@ namespace Yatzy
             Border? b = sender as Border;
             if (b == null) return;
             if (b.Tag is not Dice d) return;
+            int index = _activeplayer.Dices.IndexOf(d);
             if (!d.Issaved)
             {
                 b.BorderBrush = Brushes.Crimson;
                 d.Issaved = true;
+                _activeplayer.IsDiceSaved[index] = true;
             }
             else
             {
                 b.BorderBrush = Brushes.Blue;
                 d.Issaved = false;
+                _activeplayer.IsDiceSaved[index] = false;
             }
         }
 
