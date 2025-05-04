@@ -27,8 +27,9 @@ namespace Yatzy
             InitializeComponent();
             _lobby = lobby;
 
-            Players = lobby.Players;
+            Players = players;
             _activeplayer = Players.Count > 0 ? Players[0] : new Player();
+            _activeplayer.InitializePoints();
             DataContext = this;
             Topscorer = Load();
             AddIndex();
@@ -90,6 +91,7 @@ namespace Yatzy
         }
 
         private bool _newgame = false;
+        public bool SinglePlayerGame { get; set; } = false;
         #endregion
 
 
@@ -119,8 +121,8 @@ namespace Yatzy
                 _activeplayer.Started = true;
                 for (int i = 0; i < 5; i++)
                 {
-                    _activeplayer.RolledDices[i] = random.Next(1, 7);
-                    //_activeplayer.Dices.Add(new Dice());
+                    //_activeplayer.RolledDices[i] = random.Next(1, 7);
+                    _activeplayer.Dices.Add(new Dice(random.Next(1,7)));
                 }
                 _lobby.UpdateDice(_activeplayer.RolledDices, _activeplayer.IsDiceSaved);
                 CheckCombo();
@@ -133,13 +135,14 @@ namespace Yatzy
 
                 for (int i = 0; i < 5; i++)
                 {
-                    if (!_activeplayer.IsDiceSaved[i])
+                    //if(_activeplayer.IsDiceSaved[i])
+                    if (!_activeplayer.Dices[i].Issaved)
                     {
-                        _activeplayer.RolledDices[i] = random.Next(1, 7);
-                        //_activeplayer.Dices[i].UpdateDice(random.Next(1, 7));
+                        //_activeplayer.RolledDices[i] = random.Next(1, 7);
+                        _activeplayer.Dices[i].UpdateDice(random.Next(1, 7), true);
                     }
                 }
-                _lobby.UpdateDice(_activeplayer.RolledDices, _activeplayer.IsDiceSaved);
+                //_lobby.UpdateDice(_activeplayer.RolledDices, _activeplayer.IsDiceSaved);
                 CheckCombo();
                 if (_activeplayer._numberofrolls <= 0) { _activeplayer.OutofRolls = false; return; }
             }
@@ -147,11 +150,11 @@ namespace Yatzy
 
         public void UnPackDices(int[] nums, bool[] saves)
         {
-            for (int i = 0; i < nums.Length; i++)
-            {
-                _activeplayer.Dices.Add(new Dice());
-                _activeplayer.Dices[i].UpdateDice(nums[i], saves[i]);
-            }
+            //for (int i = 0; i < nums.Length; i++)
+            //{
+            //    _activeplayer.Dices.Add(new Dice());
+            //    _activeplayer.Dices[i].UpdateDice(nums[i], saves[i]);
+            //}
         }
 
         private void LoadImageNumberOfRolls(int rolls)
@@ -168,7 +171,7 @@ namespace Yatzy
         private void NewRound()
         {
             _activeplayer.MyTurn = false;
-            _activeplayer = Players.IndexOf(_activeplayer) == 0 ? Players[1] : Players[0];
+            if (!SinglePlayerGame) _activeplayer = Players.IndexOf(_activeplayer) == 0 ? Players[1] : Players[0];
             _activeplayer.MyTurn = true;
             _activeplayer.Started = false;
             _activeplayer.OutofRolls = true;
@@ -444,6 +447,7 @@ namespace Yatzy
         {
             if (sender is Button b && b.DataContext is PointsClass points)
             {
+                if (_activeplayer.Dices.Count == 0) return;
                 points.BakGrund = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#f7927c")); 
                 points.FontColor = Brushes.Gray;
                 points.LeftButtonEnabled = false;

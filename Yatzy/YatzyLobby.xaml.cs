@@ -35,7 +35,7 @@ namespace Yatzy
         CancellationToken cancellationToken; 
         public ObservableCollection<Player> Players { get; } = new ObservableCollection<Player>();
 
-        public ObservableCollection<ChatMessage> ChatMessages { get; } = new ObservableCollection<ChatMessage>();
+        public ObservableCollection<ChatMessage> ChatMessages { get; set; } = new ObservableCollection<ChatMessage>();
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -90,58 +90,18 @@ namespace Yatzy
             //OpenNickName();
             Loaded += async (s, e) => await OpenNickName();
             Closing += YatzyLobby_Closing;
-            // Task.Run(async () => await _popupclosed.Task).GetAwaiter().GetResult();
-            //_connection = new HubConnectionBuilder()
-            //        .WithUrl("http://193.181.23.229:50001/lobbyHub")
-            //        .Build();
-
-            //// Handle connection closed event for reconnection
-            //_connection.Closed += async (error) =>
-            //{
-            //    Dispatcher.Invoke(() =>
-            //    {
-            //        ChatMessages.Add(new ChatMessage
-            //        {
-            //            Sender = "System",
-            //            Message = error != null ? $"Connection lost: {error.Message}" : "Connection closed"
-            //        });
-            //    });
-            //    await Task.Delay(5000); // Retry after 5 seconds
-            //    await TryConnectAsync();
-            //};
-
-            //_connection.On<string>("PlayerJoined", (username) =>
-            //{
-            //    Dispatcher.Invoke(() =>
-            //    {
-            //        ChatMessages.Add(new ChatMessage { Sender = "System", Message = $"{username} joined the lobby!" });
-            //    });
-            //});
-
-            //_connection.On<object[]>("UpdatePlayerList", (playerlist) =>
-            //{
-            //    Dispatcher.Invoke(() =>
-            //    {
-            //        Players.Clear();
-            //        foreach(var item in playerlist)
-            //        {
-            //            var player = JsonConvert.DeserializeObject<Player>(item.ToString());
-            //            Players.Add(player);
-            //        }
-            //    });
-            //});
-
-            //_connection.On<string, string>("ReceiveMessage", (sender, message) =>
-            //{
-            //    Dispatcher.Invoke(() =>
-            //    {
-            //        ChatMessages.Add(new ChatMessage { Sender = sender, Message = message });
-            //    });
-            //});
-
-
-            //Task.Run(() => TryConnectAsync());
+            ChatMessages.CollectionChanged += (s, e) =>
+            {
+                if (ChatMessages.Any())
+                {
+                    Application.Current.Dispatcher.InvokeAsync(() =>
+                    {
+                        ChatMessageBox.ScrollIntoView(ChatMessages.Last());
+                    });
+                }
+            };
         }
+
 
         public async void YatzyLobby_Closing(object? sender, CancelEventArgs e)
         {
@@ -436,11 +396,17 @@ namespace Yatzy
 
         private void Start_SinglePlayer_Click(object sender, RoutedEventArgs e)
         {
-            var player = new ObservableCollection<Player>
-            { 
-                Players.FirstOrDefault(p => p.UserName == _username)
-            };
-            _mainWindow = new MainWindow(this, player);
+            var player = Players.FirstOrDefault(p => p.UserName == _username);
+            if (player == default || player == null)
+            {
+                player = new Player()
+                {
+                    UserName = _username,
+                };
+  
+            }
+            _mainWindow = new MainWindow(this, new ObservableCollection<Player> { player });
+            _mainWindow.SinglePlayerGame = true;
             _mainWindow.Show();
             cancellationTokenSource.Cancel();
             Hide();

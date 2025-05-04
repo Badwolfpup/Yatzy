@@ -144,7 +144,7 @@ namespace Yatzy
             InitializePoints();
         }
 
-        private void InitializePoints()
+        public void InitializePoints()
         {
             Points = new ObservableCollection<PointsClass>(
             new[]
@@ -191,7 +191,8 @@ namespace Yatzy
             StartButton = $"pack://application:,,,/Images/playagain.png";
             Started = false;
             _hasaddedbonus = false;
-            ResetHasPoints();
+            InitializePoints();
+            //ResetHasPoints();
         }
 
         private void ResetHasPoints()

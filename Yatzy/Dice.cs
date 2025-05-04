@@ -12,9 +12,10 @@ namespace Yatzy
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         #endregion
-        public Dice()
+        public Dice(int dice)
         {
-
+            DiceValue = dice;
+            SetSource();
         }
 
         private void SetSource()
@@ -25,7 +26,7 @@ namespace Yatzy
         public void UpdateDice(int dice, bool saved)
         {
             DiceValue = dice;
-            Issaved = saved;
+            //Issaved = saved;
             SetSource();
         }
 
