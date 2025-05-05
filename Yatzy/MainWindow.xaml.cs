@@ -313,6 +313,11 @@ namespace Yatzy
         {
             point.Point = _activeplayer.Dices.Sum(x => x.DiceValue == värde ? värde : 0);
             _activeplayer._summa.Point += point.Point;
+            _activeplayer._bonus.CalculatePlusMinus((int)_activeplayer.Points.Take(6).ToList().Sum(x =>
+            {
+                if (string.IsNullOrEmpty(x.PlusMinus)) return 0;
+                else return int.Parse(x.PlusMinus);
+            }));
             _activeplayer._total.Point += point.Point;
             point.HasPoints = true;
         }
@@ -499,21 +504,90 @@ namespace Yatzy
         }
     }
 
+    public class HideBonusButton : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool boolValue = (bool)values[0];
+            var point = values[1] as PointsClass;
+            if (point.Name == "Totalpoäng:")
+            {
+                return Visibility.Collapsed;
+            }
+
+            if (point.IsBonus) return boolValue ? Visibility.Collapsed : Visibility.Visible;
+            else return boolValue ? Visibility.Visible : Visibility.Hidden;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class HideButton : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is bool boolValue)
+            if (value is bool boolValue && parameter is bool isbonus)
             {
-                
-                return boolValue ? Visibility.Visible : Visibility.Hidden;
-                    
+                if (isbonus) return boolValue ? Visibility.Visible : Visibility.Collapsed;
+                else return boolValue ? Visibility.Visible : Visibility.Hidden;
+
             }
 
             return Visibility.Visible;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class CalculatePlusMinus: IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            var point = values[0] as int?;
+            var pointclass = values[1] as PointsClass;
+            if (point == null || pointclass == null || point == 0) return "";
+            switch (pointclass.Name)
+            {
+                case "Ettor": return $"{(point - 3 != 0 ? point - 3 > 0 ? "+" : "-" : "")}{(point - 3 != 0 ? point - 3 > 0 ? point - 3 : 3 - point : 0)}";
+                case "Tvåor": return $"{(point - 6 != 0 ? point - 6 > 0 ? "+" : "-" : "")}{(point - 6 != 0 ? point - 6 > 0 ? point - 6 : 6 - point : 0)}";
+                case "Treor": return $"{(point - 9 != 0 ? point - 9 > 0 ? "+" : "-" : "")}{(point - 9 != 0 ? point - 9 > 0 ? point - 9 : 9 - point : 0)}";
+                case "Fyror": return $"{(point - 12 != 0 ? point - 12 > 0 ? "+" : "-" : "")}{(point - 12 != 0 ? point - 12 > 0 ? point - 12 : 12 - point : 0)}";
+                case "Femmor": return $"{(point - 15 != 0 ? point - 15 > 0 ? "+" : "-" : "")}{(point - 15 != 0 ? point - 15 > 0 ? point - 15 : 15 - point : 0)}";
+                case "Sexor": return $"{(point - 18 != 0 ? point - 18 > 0 ? "+" : "-" : "")}{(point - 18 != 0 ? point - 18 > 0 ? point - 18 : 18 - point : 0)}";
+                case "Bonus": return $"{(point - 63 != 0 ? point - 63 > 0 ? "+" : "-" : "")}{(point - 63 != 0 ? point - 63 > 0 ? point - 63 : 63 - point : 0)}";
+            }
+            return "";
+
+        }
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class ShowBonusText: IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool boolValue = (bool)values[0];
+            var point = values[1] as PointsClass;
+            if (point.Name == "Totalpoäng:")
+            {
+                return Visibility.Collapsed;
+            }
+            else if (point.Name == "Summa:") return boolValue ? Visibility.Collapsed : Visibility.Visible;
+            else
+            if (point.IsBonus) return boolValue ? Visibility.Visible : Visibility.Collapsed;
+            else return boolValue ? Visibility.Hidden : Visibility.Visible;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

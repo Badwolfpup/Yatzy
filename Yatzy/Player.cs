@@ -154,6 +154,10 @@ namespace Yatzy
                     "Kåk", "Chans", "Yatzy", "Totalpoäng:"
                 }.Select(name => new PointsClass(name, 0))
             );
+            for (int i = 0; i < 6; i++)
+            {
+                Points[i].IsBonus = true;
+            }
             _summa = Points.Where(x => x.Name == "Summa:").FirstOrDefault();
             _summa = Points.Where(x => x.Name == "Summa:").FirstOrDefault();
             _summa.ShowButton = false;
@@ -162,13 +166,15 @@ namespace Yatzy
 
             _bonus = Points.Where(x => x.Name == "Bonus").FirstOrDefault();
             _bonus = Points.Where(x => x.Name == "Bonus").FirstOrDefault();
-            _bonus.ShowButton = false;
+            _bonus.ShowButton = true;
             _bonus.HasPoints = true;
             _bonus.BakGrund = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#f7927c"));
+            _bonus.IsBonus = true;
 
             _total = Points.Where(x => x.Name == "Totalpoäng:").FirstOrDefault();
             _total = Points.Where(x => x.Name == "Totalpoäng:").FirstOrDefault();
-            _total.ShowButton = false;
+            _total.ShowButton = true;
+            _total.IsBonus = true;
             _total.HasPoints = true;
             _total.BakGrund = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#f0aaed"));
         }

@@ -17,12 +17,14 @@ namespace Yatzy
 
         #region Private Fields
         private int? _point;
+        private string _plusminus;
         private FontWeight _font = FontWeights.Bold;
         private Brush _fontcolor = Brushes.Black;
         private bool _hasPoints = false;
         private bool _leftbuttonenabled = false;
         private bool _rightbuttonenabled = true;
         private bool _canselect;
+
         private SolidColorBrush _bakgrund = new SolidColorBrush(Colors.AntiqueWhite);
         #endregion
 
@@ -35,10 +37,25 @@ namespace Yatzy
                 if (_point != value)
                 {
                     _point = value;
+                    CalculatePlusMinus(0);
                     OnPropertyChanged(nameof(Point));
                 }
             }
         }
+
+        public string PlusMinus
+        {
+            get => _plusminus;
+            set
+            {
+                if (_plusminus != value)
+                {
+                    _plusminus = value;
+                    OnPropertyChanged(nameof(PlusMinus));
+                }
+            }
+        }
+
         public FontWeight Font
         {
             get => _font;
@@ -112,6 +129,7 @@ namespace Yatzy
             }
         }
         public bool ShowButton { get; set; } = true;
+        public bool IsBonus { get; set; }
         public SolidColorBrush BakGrund
         {
             get => _bakgrund;
@@ -125,6 +143,23 @@ namespace Yatzy
             }
         }
         #endregion
+
+        public void CalculatePlusMinus(int summa)
+        {
+            if (IsBonus)
+            {
+                switch (Name)
+                {
+                    case "Ettor": PlusMinus = $"{(Point - 3 != 0 ? Point - 3 > 0 ? "+" : "-" : "")}{(Point - 3 != 0 ? Point - 3 > 0 ? Point - 3 : 3 - Point : "")}"; break;
+                    case "Tvåor": PlusMinus = $"{(Point - 6 != 0 ? Point - 6 > 0 ? "+" : "-" : "")}{(Point - 6 != 0 ? Point - 6 > 0 ? Point - 6 : 6 - Point : "")}"; break;
+                    case "Treor": PlusMinus = $"{(Point - 9 != 0 ? Point - 9 > 0 ? "+" : "-" : "")}{(Point - 9 != 0 ? Point - 9 > 0 ? Point - 9 : 9 - Point : "")}"; break;
+                    case "Fyror": PlusMinus = $"{(Point - 12 != 0 ? Point - 12 > 0 ? "+" : "-" : "")}{(Point - 12 != 0 ? Point - 12 > 0 ? Point - 12 : 12 - Point : "")}"; break;
+                    case "Femmor": PlusMinus = $"{(Point - 15 != 0 ? Point - 15 > 0 ? "+" : "-" : "")}{(Point - 15 != 0 ? Point - 15 > 0 ? Point - 15 : 15 - Point : "")}"; break;
+                    case "Sexor": PlusMinus = $"{(Point - 18 != 0 ? Point - 18 > 0 ? "+" : "-" : "")}{(Point - 18 != 0 ? Point - 18 > 0 ? Point - 18 : 18 - Point : "")}"; break;
+                    case "Bonus": PlusMinus = $"{( summa > 0 ? "+" : "")}{(summa != 0 ? summa : "")}"; break;
+                }
+            }
+        }
 
         public string Name { get; set; }
 
