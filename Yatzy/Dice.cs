@@ -18,6 +18,10 @@ namespace Yatzy
             SetSource();
         }
 
+        public Dice()
+        {
+        }
+
         private void SetSource()
         {
             ImageSource = $"pack://application:,,,/Images/dice{DiceValue}.png";

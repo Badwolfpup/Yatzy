@@ -181,13 +181,13 @@ namespace Yatzy
             _connection.On<string, string>("GameStarted", (player1, player2) => {
                 Dispatcher.Invoke(() =>
                  {
-                     var mainwindow = new MainWindow(this, new ObservableCollection<Player>
+                     _mainWindow = new MainWindow(this, new ObservableCollection<Player>
                      {
                         Players.FirstOrDefault(p => p.UserName == player1),
                         Players.FirstOrDefault(p => p.UserName == player2)
                      });
                      InQueue = false;
-                     mainwindow.Show();
+                     _mainWindow.Show();
                      cancellationTokenSource.Cancel();
                      Hide();
                  });
