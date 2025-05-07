@@ -64,7 +64,7 @@
                                         </ItemsControl.ItemsPanel>
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Border x:Name="border1" Tag="{Binding}" Margin="0 0 10 0" Width="50"  BorderBrush="blue" BorderThickness="2" CornerRadius="3" MouseDown="Border_MouseDown">
+                                                <Border x:Name="border1" Tag="{Binding}" Margin="0 0 10 0" Width="50"  BorderBrush="{Binding Color}" BorderThickness="2" CornerRadius="3" MouseDown="Border_MouseDown">
                                                     <Image Source="{Binding ImageSource}"/>
 
                                                 </Border>

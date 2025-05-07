@@ -29,7 +29,7 @@ namespace Yatzy
     public partial class YatzyLobby : Window, INotifyPropertyChanged
     {
         private  HubConnection _connection;
-        private string _username = "";
+        public string _username = "";
         private MainWindow _mainWindow;
         CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         CancellationToken cancellationToken; 

@@ -26,7 +26,7 @@ namespace Yatzy
         {
             InitializeComponent();
             _lobby = lobby;
-
+            Title = lobby._username;
             Players = players;
             _activeplayer = Players.Count > 0 ? Players[0] : new Player();
             _activeplayer.InitializePoints();
@@ -113,7 +113,7 @@ namespace Yatzy
             Random random = new Random();
 
             if (!_activeplayer.Started)
-            {
+            {   
                 _activeplayer.ResetBackground();
 
                 _activeplayer.Dices = new ObservableCollection<Dice>();
@@ -150,10 +150,12 @@ namespace Yatzy
 
         public void UnPackDices(int[] nums, bool[] saves)
         {
+            _activeplayer.Dices.Clear();    
             for (int i = 0; i < nums.Length; i++)
             {
                 _activeplayer.Dices.Add(new Dice());
                 _activeplayer.Dices[i].UpdateDice(nums[i], saves[i]);
+                _activeplayer.Dices[i].UpdateBorderColor(saves[i]);
             }
         }
 
@@ -185,19 +187,10 @@ namespace Yatzy
             Border? b = sender as Border;
             if (b == null) return;
             if (b.Tag is not Dice d) return;
-            int index = _activeplayer.Dices.IndexOf(d);
-            if (!d.Issaved)
-            {
-                b.BorderBrush = Brushes.Crimson;
-                d.Issaved = true;
-                _activeplayer.IsDiceSaved[index] = true;
-            }
-            else
-            {
-                b.BorderBrush = Brushes.Blue;
-                d.Issaved = false;
-                _activeplayer.IsDiceSaved[index] = false;
-            }
+            var index = _activeplayer.Dices.IndexOf(d);
+            if (index < 0) return;
+            _activeplayer.IsDiceSaved[index] = !_activeplayer.IsDiceSaved[index];
+            _lobby.UpdateDice(_activeplayer.RolledDices, _activeplayer.IsDiceSaved);
         }
 
 

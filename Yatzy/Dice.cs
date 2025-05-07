@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Windows.Media;
 
 namespace Yatzy
 {
@@ -32,6 +33,32 @@ namespace Yatzy
             DiceValue = dice;
             //Issaved = saved;
             SetSource();
+        }
+
+        public void UpdateBorderColor(bool clicked)
+        {
+            if (clicked)
+            {
+                Color = new SolidColorBrush(Colors.Crimson);
+            }
+            else
+            {
+                Color = new SolidColorBrush(Colors.Blue);
+            }
+        }
+
+        private SolidColorBrush _color = new SolidColorBrush(Colors.Blue);
+        public SolidColorBrush Color
+        {
+            get => _color;
+            set
+            {
+                if (_color != value)
+                {
+                    _color = value;
+                    OnPropertyChanged(nameof(Color));
+                }
+            }
         }
 
         private int _dicevalue;
