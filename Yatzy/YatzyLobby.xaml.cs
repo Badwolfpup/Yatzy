@@ -19,6 +19,7 @@ using Newtonsoft.Json.Serialization;
 using System.Diagnostics;
 using System.Windows.Controls.Primitives;
 using System.Windows.Threading;
+using Newtonsoft.Json;
 using System.Net.Sockets;
 
 namespace Yatzy
@@ -193,11 +194,11 @@ namespace Yatzy
                  });
             });
 
-            _connection.On<int[], bool[]>("UpdateDice", (number, saved) =>
+            _connection.On<string>("UpdatePlayer", (json) =>
             {
                 Dispatcher.Invoke(() =>
                 {
-                    _mainWindow.UnPackDices(number, saved);
+                    _mainWindow.UnPackPlayers(json);
                 });
             });
 
@@ -205,9 +206,16 @@ namespace Yatzy
 
         }
 
-        public async Task UpdateDice(int[] nums, bool[] saves)
+        public async Task UpdatePlayer(ObservableCollection<Player> players)
         {
-            _connection.InvokeAsync("UpdateDice", nums, saves);
+            var json = JsonConvert.SerializeObject(players, new JsonSerializerSettings
+            {
+                ContractResolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new CamelCaseNamingStrategy()
+                }
+            });
+            _connection.InvokeAsync("UpdatePlayer", json);
         }
 
         private async Task OpenNickName()

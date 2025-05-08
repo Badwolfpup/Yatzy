@@ -57,8 +57,8 @@ namespace Yatzy
             }
         }
 
-        public int[] RolledDices { get; set; } = new int[5];
-        public bool[] IsDiceSaved { get; set; } = new bool[5];
+        //public int[] RolledDices { get; set; } = new int[5];
+        //public bool[] IsDiceSaved { get; set; } = new bool[5];
 
         private bool _outofrolls = true;
         public bool OutofRolls
@@ -201,16 +201,6 @@ namespace Yatzy
             //ResetHasPoints();
         }
 
-        private void ResetHasPoints()
-        {
-            foreach (var item in Points)
-            {
-                item.HasPoints = false;
-            }
-            _total.HasPoints = true;
-            _summa.HasPoints = true;
-            _bonus.HasPoints = true;
-        }
 
         //[JsonProperty("username")]
         public string UserName

@@ -28,8 +28,11 @@ namespace Yatzy
             _lobby = lobby;
             Title = lobby._username;
             Players = players;
-            _activeplayer = Players.Count > 0 ? Players[0] : new Player();
+            if (Players.Count > 0) _activeplayer = Players[0];
+            else _activeplayer = new Player();
+            //_activeplayer = Players.Count > 0 ? Players[0] : new Player();
             _activeplayer.InitializePoints();
+            _activeplayer.MyTurn = true;
             DataContext = this;
             Topscorer = Load();
             AddIndex();
@@ -121,10 +124,10 @@ namespace Yatzy
                 _activeplayer.Started = true;
                 for (int i = 0; i < 5; i++)
                 {
-                    _activeplayer.RolledDices[i] = random.Next(1, 7);
-                    //_activeplayer.Dices.Add(new Dice(random.Next(1,7)));
+                    //_activeplayer.RolledDices[i] = random.Next(1, 7);
+                    _activeplayer.Dices.Add(new Dice(random.Next(1,7)));
                 }
-                _lobby.UpdateDice(_activeplayer.RolledDices, _activeplayer.IsDiceSaved);
+                
                 CheckCombo();
             }
             else
@@ -136,27 +139,34 @@ namespace Yatzy
                 for (int i = 0; i < 5; i++)
                 {
                     //if (!_activeplayer.Dices[i].Issaved)
-                    if(_activeplayer.IsDiceSaved[i])
+                    if (!_activeplayer.Dices[i].Issaved)
                     {
-                        _activeplayer.RolledDices[i] = random.Next(1, 7);
-                        //_activeplayer.Dices[i].UpdateDice(random.Next(1, 7), true);
+                        //_activeplayer.RolledDices[i] = random.Next(1, 7);
+                        _activeplayer.Dices[i].UpdateDice(random.Next(1, 7));
                     }
                 }
-                _lobby.UpdateDice(_activeplayer.RolledDices, _activeplayer.IsDiceSaved);
                 CheckCombo();
                 if (_activeplayer._numberofrolls <= 0) { _activeplayer.OutofRolls = false; return; }
             }
         }
 
-        public void UnPackDices(int[] nums, bool[] saves)
+        public void UnPackPlayers(string players)
         {
-            _activeplayer.Dices.Clear();    
-            for (int i = 0; i < nums.Length; i++)
+            var index = Players.IndexOf(_activeplayer);
+            var json = JsonConvert.DeserializeObject<ObservableCollection<Player>>(players);
+            Players.Clear();
+            foreach (var item in json)
             {
-                _activeplayer.Dices.Add(new Dice());
-                _activeplayer.Dices[i].UpdateDice(nums[i], saves[i]);
-                _activeplayer.Dices[i].UpdateBorderColor(saves[i]);
+                Players.Add(item);
             }
+            _activeplayer = Players[index];
+            //_activeplayer.Dices.Clear();    
+            //for (int i = 0; i < json.Count; i++)
+            //{
+            //    _activeplayer.Dices.Add(new Dice());
+            //    _activeplayer.Dices[i].UpdateDice(nums[i], saves[i]);
+            //    _activeplayer.Dices[i].UpdateBorderColor(saves[i]);
+            //}
         }
 
         private void LoadImageNumberOfRolls(int rolls)
@@ -184,13 +194,16 @@ namespace Yatzy
 
         private void Border_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            if (!_activeplayer.Equals(Players[0])) return;
+
             Border? b = sender as Border;
             if (b == null) return;
             if (b.Tag is not Dice d) return;
+            d.Issaved = !d.Issaved;
             var index = _activeplayer.Dices.IndexOf(d);
-            if (index < 0) return;
-            _activeplayer.IsDiceSaved[index] = !_activeplayer.IsDiceSaved[index];
-            _lobby.UpdateDice(_activeplayer.RolledDices, _activeplayer.IsDiceSaved);
+            //if (index < 0) return;
+            //_activeplayer.IsDiceSaved[index] = !_activeplayer.IsDiceSaved[index];
+            _lobby.UpdatePlayer(Players);
         }
 
 
@@ -223,6 +236,7 @@ namespace Yatzy
                     _activeplayer._bonus.BakGrund = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#9bf29f"));
                 }
             }
+            _lobby.UpdatePlayer(Players);
         }
 
         private bool AddPoints(PointsClass point)

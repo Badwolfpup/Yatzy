@@ -28,23 +28,10 @@ namespace Yatzy
             ImageSource = $"pack://application:,,,/Images/dice{DiceValue}.png";
         }
 
-        public void UpdateDice(int dice, bool saved)
+        public void UpdateDice(int dice)
         {
             DiceValue = dice;
-            //Issaved = saved;
             SetSource();
-        }
-
-        public void UpdateBorderColor(bool clicked)
-        {
-            if (clicked)
-            {
-                Color = new SolidColorBrush(Colors.Crimson);
-            }
-            else
-            {
-                Color = new SolidColorBrush(Colors.Blue);
-            }
         }
 
         private SolidColorBrush _color = new SolidColorBrush(Colors.Blue);
@@ -96,6 +83,7 @@ namespace Yatzy
                 if (_issaved != value)
                 {
                     _issaved = value;
+                    Color = _issaved ? new SolidColorBrush(Colors.Crimson) : new SolidColorBrush(Colors.Blue);
                     OnPropertyChanged(nameof(Issaved));
                 }
             }
