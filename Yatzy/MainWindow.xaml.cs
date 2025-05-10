@@ -190,10 +190,7 @@ namespace Yatzy
 
         public void UpdateTurn()
         {
-            foreach (var player in Players)
-            {
-                player.MyTurn = !player.MyTurn;
-            }
+            _activeplayer = Players.IndexOf(_activeplayer) == 0 ? Players[1] : Players[0];
         }
 
 
