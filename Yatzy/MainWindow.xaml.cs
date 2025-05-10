@@ -151,6 +151,7 @@ namespace Yatzy
                         _activeplayer.Dices[i].UpdateDice(random.Next(1, 7));
                     }
                 }
+                _lobby.UpdateDicevalue(_activeplayer.Dices);
                 CheckCombo();
                 if (_activeplayer._numberofrolls <= 0) { _activeplayer.OutofRolls = false; return; }
             }
@@ -246,7 +247,7 @@ namespace Yatzy
             {
                 if (b.Tag is not Dice d) return;
                 d.Issaved = !d.Issaved;
-                _lobby.UpdatePlayer(Players);
+                _lobby.UpdateDiceBorder((_activeplayer.Dices.IndexOf(d), d.Issaved));
                 //var index = _activeplayer.Dices.IndexOf(d);
                 //if (index < 0) return;
                 ////_activeplayer.IsDiceSaved[index] = !_activeplayer.IsDiceSaved[index];
@@ -289,7 +290,7 @@ namespace Yatzy
                     _activeplayer._bonus.BakGrund = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#9bf29f"));
                 }
             }
-            _lobby.UpdatePlayer(Players);
+            
         }
 
         private bool AddPoints(PointsClass point)
@@ -506,6 +507,7 @@ namespace Yatzy
                 points.RightButtonEnabled = false;
                 points.HasPoints = true;
                 AddPoints(points);
+                _lobby.UpdatePoints(_activeplayer.Points);
                 NewRound();
             }
         }
@@ -522,6 +524,7 @@ namespace Yatzy
                 points.RightButtonEnabled = false;
                 points.HasPoints = true;
                 points.Point = 0;
+                _lobby.UpdatePoints(_activeplayer.Points);
                 NewRound();
             }
         }
