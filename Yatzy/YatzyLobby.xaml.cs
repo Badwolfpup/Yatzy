@@ -210,7 +210,7 @@ namespace Yatzy
                 });
             });
 
-            _connection.On<string>("UpdateTurn", (json) =>
+            _connection.On("UpdateTurn", () =>
             {
                 Dispatcher.Invoke(() =>
                 {

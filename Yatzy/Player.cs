@@ -131,7 +131,7 @@ namespace Yatzy
             }
         }
 
-        public int _numberofrolls { get; set; } = 3;
+        public int _numberofrolls { get; set; } = 4;
         public bool _hasaddedbonus { get; set; } = false;
         private string _username;
         public PointsClass? _total {get; set;}
