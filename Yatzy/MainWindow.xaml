@@ -7,7 +7,7 @@
         xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:local="clr-namespace:Yatzy"
         mc:Ignorable="d"
-        Title="Yatzy" Height="1050" Width="800" KeyDown="MetroWindow_KeyDown" WindowStyle="None" WindowStartupLocation="CenterScreen">
+        Title="Yatzy" Height="950" Width="800" KeyDown="MetroWindow_KeyDown" WindowStyle="None" WindowStartupLocation="CenterScreen">
     <mah:MetroWindow.Resources>
         <local:AddSpaceConverter x:Key="AddSpaceConverter"/>
         <local:HideButton x:Key="HideButton"/>
@@ -105,10 +105,10 @@
                                                     <ColumnDefinition Width="auto"></ColumnDefinition>
                                                     <ColumnDefinition Width="auto"></ColumnDefinition>
                                                 </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" Text="{Binding Name}" FontWeight="{Binding Font}" Foreground="{Binding FontColor}" VerticalAlignment="Center" Padding="5 0 0 0" FontSize="16"></TextBlock>
-                                                <Button Grid.Column="1" Width="30" Height="30" FontFamily="Segoe UI" Content="&#x2714;" Foreground="ForestGreen" Margin="0 5 0 5" Click="AddScore_Click" IsEnabled="{Binding LeftButtonEnabled}" Visibility="{Binding ShowButton, Converter={StaticResource HideButton}}"></Button>
-                                                <TextBlock Margin="10 0 10 0" Text="{Binding Point}" Width="30" Grid.Column="2" FontWeight="{Binding Font}" TextAlignment="Center" VerticalAlignment="Center" FontSize="16"/>
-                                                <Button Grid.Column="3" Width="30" Height="30" FontFamily="Segoe UI" Content="&#x274C;" Foreground="Red" IsEnabled="{Binding RightButtonEnabled}" Click="StrikeScore_Click">
+                                                <TextBlock Grid.Column="0" Height="25" Text="{Binding Name}" FontWeight="{Binding Font}" Foreground="{Binding FontColor}" VerticalAlignment="Center" Padding="5 0 0 0" FontSize="16"></TextBlock>
+                                                <Button Grid.Column="1" Width="30" Height="25" FontFamily="Segoe UI" Content="&#x2714;" Foreground="ForestGreen" Margin="0 5 0 5" Click="AddScore_Click" IsEnabled="{Binding LeftButtonEnabled}" Visibility="{Binding ShowButton, Converter={StaticResource HideButton}}"></Button>
+                                                <TextBlock Margin="10 0 10 0" Height="25" Text="{Binding Point}" Width="30" Grid.Column="2" FontWeight="{Binding Font}" TextAlignment="Center" VerticalAlignment="Center" FontSize="16"/>
+                                                <Button Grid.Column="3" Width="30" Height="25" FontFamily="Segoe UI" Content="&#x274C;" Foreground="Red" IsEnabled="{Binding RightButtonEnabled}" Click="StrikeScore_Click">
                                                     <Button.Visibility>
                                                         <MultiBinding Converter="{StaticResource HideBonusButton}">
                                                             <Binding Path="ShowButton"/>
@@ -116,7 +116,7 @@
                                                         </MultiBinding>
                                                     </Button.Visibility>
                                                 </Button>
-                                                <TextBlock Grid.Column="3" Text="{Binding PlusMinus}" FontWeight="{Binding Font}" TextAlignment="Center" VerticalAlignment="Center" FontSize="16">
+                                                <TextBlock Grid.Column="3" Height="25" Text="{Binding PlusMinus}" FontWeight="{Binding Font}" TextAlignment="Center" VerticalAlignment="Center" FontSize="16">
                                                     <!--<TextBlock.Text>
                                                         <MultiBinding Converter="{StaticResource CalculatePlusMinus}">
                                                             <Binding Path="Point"/>

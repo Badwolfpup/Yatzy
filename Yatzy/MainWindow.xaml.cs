@@ -509,6 +509,7 @@ namespace Yatzy
                 points.HasPoints = true;
                 AddPoints(points);
                 _lobby.UpdatePoints(_activeplayer.Points);
+                _lobby.UpdateTurn();
                 NewRound();
             }
         }
@@ -526,6 +527,7 @@ namespace Yatzy
                 points.HasPoints = true;
                 points.Point = 0;
                 _lobby.UpdatePoints(_activeplayer.Points);
+                _lobby.UpdateTurn();
                 NewRound();
             }
         }
