@@ -140,7 +140,14 @@ namespace Yatzy
 
         public Player()
         {
-            Dices = new ObservableCollection<Dice>();
+            Dices = new ObservableCollection<Dice>()
+            {
+                new Dice(1),
+                new Dice(2),
+                new Dice(3),
+                new Dice(4),
+                new Dice(5)
+            };
             InitializePoints();
         }
 

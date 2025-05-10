@@ -121,23 +121,23 @@ namespace Yatzy
             }
             Random random = new Random();
 
-            if (!_activeplayer.Started)
-            {   
-                _activeplayer.ResetBackground();
+            //if (!_activeplayer.Started)
+            //{   
+            //    _activeplayer.ResetBackground();
 
-                _activeplayer.Dices = new ObservableCollection<Dice>();
-                LoadImageNumberOfRolls(_activeplayer._numberofrolls);
-                _activeplayer.Started = true;
-                for (int i = 0; i < 5; i++)
-                {
-                    //_activeplayer.RolledDices[i] = random.Next(1, 7);
-                    _activeplayer.Dices.Add(new Dice(random.Next(1,7)));
-                }
+            //    _activeplayer.Dices = new ObservableCollection<Dice>();
+            //    LoadImageNumberOfRolls(_activeplayer._numberofrolls);
+            //    _activeplayer.Started = true;
+            //    for (int i = 0; i < 5; i++)
+            //    {
+            //        //_activeplayer.RolledDices[i] = random.Next(1, 7);
+            //        _activeplayer.Dices.Add(new Dice(random.Next(1,7)));
+            //    }
                 
-                CheckCombo();
-            }
-            else
-            {
+            //    CheckCombo();
+            //}
+            //else
+            //{
                 _activeplayer.ResetBackground();
                 _activeplayer._numberofrolls--;
                 LoadImageNumberOfRolls(_activeplayer._numberofrolls);
@@ -154,10 +154,18 @@ namespace Yatzy
                 _lobby.UpdateDicevalue(_activeplayer.Dices);
                 CheckCombo();
                 if (_activeplayer._numberofrolls <= 0) { _activeplayer.OutofRolls = false; return; }
-            }
+            
         }
 
-
+        public void AddDices(string dices)
+        {
+            var nums = JsonConvert.DeserializeObject<List<int>>(dices);
+            _activeplayer.Dices.Clear();
+            for (int i = 0; i < nums.Count; i++)
+            {
+                _activeplayer.Dices.Add(new Dice(nums[i]));
+            }
+        }
 
         public void UpdateDiceValue(string dice)
         {
@@ -235,7 +243,7 @@ namespace Yatzy
             _activeplayer.MyTurn = true;
             _activeplayer.Started = false;
             _activeplayer.OutofRolls = true;
-            _activeplayer._numberofrolls = 3;
+            _activeplayer._numberofrolls = 4;
             RollDices();
         }
 
