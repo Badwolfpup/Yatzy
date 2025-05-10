@@ -28,9 +28,12 @@ namespace Yatzy
             _lobby = lobby;
             Title = lobby._username;
             Players = players;
-            if (Players.Count > 0) _activeplayer = Players[0];
-            else _activeplayer = new Player();
-            //_activeplayer = Players.Count > 0 ? Players[0] : new Player();
+            if (Players.Count > 0)
+            {
+                _myplayer = Players.FirstOrDefault(x => x.UserName == lobby._username) ?? new Player();
+                _opponent = Players.FirstOrDefault(x => x.UserName != lobby._username) ?? new Player();
+            }
+            _activeplayer = Players.Count > 0 ? Players[0] : new Player();
             _activeplayer.InitializePoints();
             _activeplayer.MyTurn = true;
             DataContext = this;
@@ -64,6 +67,8 @@ namespace Yatzy
         private readonly YatzyLobby _lobby;
 
         private Player _activeplayer;
+        private Player _myplayer;
+        private Player _opponent;
 
         private ObservableCollection<HighScore>? _topscorer;
         public ObservableCollection<HighScore>? Topscorer
@@ -176,6 +181,9 @@ namespace Yatzy
 
         private void NewGame_Click(object sender, RoutedEventArgs e)
         {
+            if (!_activeplayer.Equals(_myplayer)) return;
+            if (sender is Button b && b.DataContext is Player player && !player.Equals(_activeplayer)) return;
+
             _activeplayer.ResetBackground();
             RollDices();
         }

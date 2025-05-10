@@ -133,7 +133,7 @@ namespace Yatzy
             //.WithUrl("http://193.181.23.229:50001/lobbyHub")
             //.Build();
             _connection = new HubConnectionBuilder()
-           .WithUrl("http://localhost:5000/lobbyHub")
+           .WithUrl("http://192.168.0.3:5000/lobbyHub")
            .Build();
             // Handle connection closed event for reconnection
             _connection.Closed += async (error) =>
