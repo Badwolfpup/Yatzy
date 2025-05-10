@@ -153,8 +153,7 @@ namespace Yatzy
                 }
             }
             _lobby.UpdateDicevalue(_activeplayer.Dices);
-            _activeplayer.ResetBackground();
-            CheckCombo();
+
             if (_activeplayer._numberofrolls <= 0) { _activeplayer.OutofRolls = false; return; }
             
         }
@@ -177,6 +176,8 @@ namespace Yatzy
             {
                 _activeplayer.Dices[i].UpdateDice(updateddice[i]);
             }
+            _activeplayer.ResetBackground();
+            CheckCombo();
         }
 
         public void UpdateDiceBorder(string dice)
