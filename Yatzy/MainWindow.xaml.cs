@@ -109,7 +109,7 @@ namespace Yatzy
             if (_newgame)
             {
                 _activeplayer.Reset();
-                _activeplayer._numberofrolls = 3;
+                _activeplayer._numberofrolls = 4;
                 _newgame = false;
             }
             if (_activeplayer.Points.All(x => x.HasPoints) && !_newgame)
@@ -141,7 +141,7 @@ namespace Yatzy
             
             _activeplayer._numberofrolls--;
 
-            LoadImageNumberOfRolls(_activeplayer._numberofrolls);
+            
             if (_activeplayer.Dices == null) _activeplayer.InititalizeDices();
             for (int i = 0; i < 5; i++)
             {
@@ -176,6 +176,7 @@ namespace Yatzy
             {
                 _activeplayer.Dices[i].UpdateDice(updateddice[i]);
             }
+            LoadImageNumberOfRolls(_activeplayer._numberofrolls);
             _activeplayer.ResetBackground();
             CheckCombo();
         }
