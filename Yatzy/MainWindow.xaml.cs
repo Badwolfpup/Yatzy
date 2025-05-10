@@ -138,22 +138,23 @@ namespace Yatzy
             //}
             //else
             //{
-                _activeplayer.ResetBackground();
-                _activeplayer._numberofrolls--;
-                LoadImageNumberOfRolls(_activeplayer._numberofrolls);
+            _activeplayer.ResetBackground();
+            _activeplayer._numberofrolls--;
 
-                for (int i = 0; i < 5; i++)
+            LoadImageNumberOfRolls(_activeplayer._numberofrolls);
+            if (_activeplayer.Dices == null) _activeplayer.InititalizeDices();
+            for (int i = 0; i < 5; i++)
+            {
+                //if (!_activeplayer.Dices[i].Issaved)
+                if (!_activeplayer.Dices[i].Issaved)
                 {
-                    //if (!_activeplayer.Dices[i].Issaved)
-                    if (!_activeplayer.Dices[i].Issaved)
-                    {
-                        //_activeplayer.RolledDices[i] = random.Next(1, 7);
-                        _activeplayer.Dices[i].UpdateDice(random.Next(1, 7));
-                    }
+                    //_activeplayer.RolledDices[i] = random.Next(1, 7);
+                    _activeplayer.Dices[i].UpdateDice(random.Next(1, 7));
                 }
-                _lobby.UpdateDicevalue(_activeplayer.Dices);
-                CheckCombo();
-                if (_activeplayer._numberofrolls <= 0) { _activeplayer.OutofRolls = false; return; }
+            }
+            _lobby.UpdateDicevalue(_activeplayer.Dices);
+            CheckCombo();
+            if (_activeplayer._numberofrolls <= 0) { _activeplayer.OutofRolls = false; return; }
             
         }
 
