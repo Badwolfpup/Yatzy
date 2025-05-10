@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Windows;
@@ -30,8 +31,8 @@ namespace Yatzy
             Players = players;
             if (Players.Count > 0)
             {
-                _myplayer = Players.FirstOrDefault(x => x.UserName == lobby._username) ?? new Player();
-                _opponent = Players.FirstOrDefault(x => x.UserName != lobby._username) ?? new Player();
+                _myplayer = Players.IndexOf(Players.FirstOrDefault(x => x.UserName == lobby._username));
+                _opponent = _myplayer == 0 ? 1 : 0;
             }
             _activeplayer = Players.Count > 0 ? Players[0] : new Player();
             _activeplayer.InitializePoints();
@@ -67,8 +68,8 @@ namespace Yatzy
         private readonly YatzyLobby _lobby;
 
         private Player _activeplayer;
-        private Player _myplayer;
-        private Player _opponent;
+        private int _myplayer;
+        private int _opponent;
 
         private ObservableCollection<HighScore>? _topscorer;
         public ObservableCollection<HighScore>? Topscorer
@@ -181,7 +182,7 @@ namespace Yatzy
 
         private void NewGame_Click(object sender, RoutedEventArgs e)
         {
-            if (!_activeplayer.Equals(_myplayer)) return;
+            if (Players.IndexOf(_activeplayer) != _myplayer) return;
             if (sender is Button button && button.DataContext is Player player && !player.Equals(_activeplayer)) return;
 
             _activeplayer.ResetBackground();
@@ -202,7 +203,7 @@ namespace Yatzy
 
         private void Border_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (!_activeplayer.Equals(_myplayer)) return;
+            if (Players.IndexOf(_activeplayer) != _myplayer) return;
             if (sender is Border b && b.DataContext is Dice dice && _activeplayer.Equals(Players.FirstOrDefault(x => x.Dices.Contains(dice))))
             {
                 if (b.Tag is not Dice d) return;
@@ -457,8 +458,8 @@ namespace Yatzy
 
         private void AddScore_Click(object sender, RoutedEventArgs e)
         {
-            if (!_activeplayer.Equals(_myplayer)) return;
-            if (sender is Button b && b.DataContext is Player player && !player.Equals(_activeplayer)) return;
+            if (Players.IndexOf(_activeplayer) != _myplayer) return;
+            //if (sender is Button b && b.DataContext is Player player && !player.Equals(_activeplayer)) return;
             if (sender is Button b && b.DataContext is PointsClass points)
             {
                 points.BakGrund = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#9bf29f"));
@@ -473,6 +474,7 @@ namespace Yatzy
 
         private void StrikeScore_Click(object sender, RoutedEventArgs e)
         {
+            if (Players.IndexOf(_activeplayer) != _myplayer) return;
             if (sender is Button b && b.DataContext is PointsClass points)
             {
                 if (_activeplayer.Dices.Count == 0) return;
