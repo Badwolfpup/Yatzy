@@ -156,6 +156,32 @@ namespace Yatzy
             }
         }
 
+
+
+        public void UpdateDiceValue(string dice)
+        {
+            var updateddice = JsonConvert.DeserializeObject<List<int>>(dice);
+            for (int i = 0; i < updateddice.Count; i++)
+            {
+                _activeplayer.Dices[i].UpdateDice(updateddice[i]);
+            }
+        }
+
+        public void UpdateDiceBorder(string dice)
+        {
+            var updateddice = JsonConvert.DeserializeObject<(int index, bool border)>(dice);
+            _activeplayer.Dices[updateddice.index].Issaved = updateddice.border;
+
+        }
+
+        public void UpdateTurn()
+        {
+            foreach (var player in Players)
+            {
+                player.MyTurn = !player.MyTurn;
+            }
+        }
+
         public static void CopyProperties<T>(T source, T destination, params string[] propertiesToSkip)
         {
             var props = typeof(T).GetProperties().Where(p => p.CanRead && p.CanWrite && !propertiesToSkip.Contains(p.Name));
@@ -164,24 +190,14 @@ namespace Yatzy
                 var value = prop.GetValue(source);
                 prop.SetValue(destination, value);
             }
-        }
+        }  
 
-        public void UnPackPlayers(string players)
+        public void UpdatePoints(string points)
         {
+            var updatedpoints = JsonConvert.DeserializeObject<ObservableCollection<PointsClass>>(points);
+            CopyProperties(updatedpoints, _activeplayer.Points);
+
             //var index = Players.IndexOf(_activeplayer);
-            var updatedPlayers = JsonConvert.DeserializeObject<ObservableCollection<Player>>(players);
-            for (int i = 0; i<Players.Count; i++)
-            {
-                CopyProperties(updatedPlayers[i], Players[i], "Points", "Dices");
-                for (int j = 0; j < Players[i].Dices.Count; j++)
-                {
-                    CopyProperties(updatedPlayers[i].Dices[j], Players[i].Dices[j]);
-                }
-                for (int j = 0; j < Players[i].Points.Count; j++)
-                {
-                    CopyProperties(updatedPlayers[i].Points[j], Players[i].Points[j]);
-                }
-            }
             //Players.Clear();
             //foreach (var item in json)
             //{

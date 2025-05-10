@@ -194,11 +194,35 @@ namespace Yatzy
                  });
             });
 
-            _connection.On<string>("UpdatePlayer", (json) =>
+            _connection.On<string>("UpdateDiceValue", (json) =>
             {
                 Dispatcher.Invoke(() =>
                 {
-                    _mainWindow.UnPackPlayers(json);
+                    _mainWindow.UpdateDiceValue(json);
+                });
+            });
+
+            _connection.On<string>("UpdateDiceBorder", (json) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    _mainWindow.UpdateDiceBorder(json);
+                });
+            });
+
+            _connection.On<string>("UpdateTurn", (json) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    _mainWindow.UpdateTurn();
+                });
+            });
+
+            _connection.On<string>("UpdatePoints", (json) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    _mainWindow.UpdatePoints(json);
                 });
             });
 
@@ -206,16 +230,46 @@ namespace Yatzy
 
         }
 
-        public async Task UpdatePlayer(ObservableCollection<Player> players)
+        public async Task UpdateDicevalue(ObservableCollection<Dice> dices)
         {
-            var json = JsonConvert.SerializeObject(players, new JsonSerializerSettings
+            var dicevalues = dices.Select(d => d.DiceValue).ToList();
+            var json = JsonConvert.SerializeObject(dicevalues, new JsonSerializerSettings
             {
                 ContractResolver = new DefaultContractResolver
                 {
                     NamingStrategy = new CamelCaseNamingStrategy()
                 }
             });
-            _connection.InvokeAsync("UpdatePlayer", json);
+            _connection.InvokeAsync("UpdateDicevalue", json);
+        }
+
+        public async Task UpdateDiceBorder((int index, bool border) changeborder)
+        {
+            var json = JsonConvert.SerializeObject(changeborder, new JsonSerializerSettings
+            {
+                ContractResolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new CamelCaseNamingStrategy()
+                }
+            });
+            _connection.InvokeAsync("UpdateDiceBorder", json);
+        }
+
+        public async Task UpdateTurn()
+        {
+            _connection.InvokeAsync("UpdateTurn");
+        }
+
+        public async Task UpdatePoints(ObservableCollection<PointsClass> points)
+        {
+            var json = JsonConvert.SerializeObject(points, new JsonSerializerSettings
+            {
+                ContractResolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new CamelCaseNamingStrategy()
+                }
+            });
+            _connection.InvokeAsync("UpdatePoints", json);
         }
 
         private async Task OpenNickName()
