@@ -138,7 +138,7 @@ namespace Yatzy
             //}
             //else
             //{
-            _activeplayer.ResetBackground();
+            
             _activeplayer._numberofrolls--;
 
             LoadImageNumberOfRolls(_activeplayer._numberofrolls);
@@ -176,6 +176,7 @@ namespace Yatzy
             {
                 _activeplayer.Dices[i].UpdateDice(updateddice[i]);
             }
+            _activeplayer.ResetBackground();
         }
 
         public void UpdateDiceBorder(string dice)
@@ -233,8 +234,6 @@ namespace Yatzy
         {
             if (Players.IndexOf(_activeplayer) != _myplayer) return;
             if (sender is Button button && button.DataContext is Player player && !player.Equals(_activeplayer)) return;
-
-            _activeplayer.ResetBackground();
             RollDices();
         }
 
