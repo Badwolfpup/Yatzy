@@ -36,7 +36,7 @@ namespace Yatzy
             }
             _activeplayer = Players.Count > 0 ? Players[0] : new Player();
             _activeplayer.InitializePoints();
-            _activeplayer.MyTurn = true;
+            //_activeplayer.MyTurn = true;
             DataContext = this;
             Topscorer = Load();
             AddIndex();
@@ -139,8 +139,19 @@ namespace Yatzy
             //else
             //{
             
-            _activeplayer._numberofrolls--;
-
+            
+            if (!_activeplayer.Started)
+            {
+                _activeplayer.Started = true;
+                if (_activeplayer.Dices != null)
+                {
+                    foreach (var item in _activeplayer.Dices)
+                    {
+                        item.Issaved = false;
+                        if (!SinglePlayerGame) _lobby.UpdateDiceBorder((_activeplayer.Dices.IndexOf(item), false));
+                    }
+                }
+            }
             
             if (_activeplayer.Dices == null) _activeplayer.InititalizeDices();
             for (int i = 0; i < 5; i++)
@@ -152,20 +163,19 @@ namespace Yatzy
                     _activeplayer.Dices[i].UpdateDice(random.Next(1, 7));
                 }
             }
-            _lobby.UpdateDicevalue(_activeplayer.Dices);
+            if (SinglePlayerGame) UpdateGameInfo();
+            else _lobby.UpdateDicevalue(_activeplayer.Dices);
 
             if (_activeplayer._numberofrolls <= 0) { _activeplayer.OutofRolls = false; return; }
             
         }
 
-        public void AddDices(string dices)
+        private void UpdateGameInfo()
         {
-            var nums = JsonConvert.DeserializeObject<List<int>>(dices);
-            _activeplayer.Dices.Clear();
-            for (int i = 0; i < nums.Count; i++)
-            {
-                _activeplayer.Dices.Add(new Dice(nums[i]));
-            }
+            _activeplayer._numberofrolls--;
+            LoadImageNumberOfRolls(_activeplayer._numberofrolls);
+            _activeplayer.ResetBackground();
+            CheckCombo();
         }
 
         public void UpdateDiceValue(string dice)
@@ -176,9 +186,7 @@ namespace Yatzy
             {
                 _activeplayer.Dices[i].UpdateDice(updateddice[i]);
             }
-            LoadImageNumberOfRolls(_activeplayer._numberofrolls);
-            _activeplayer.ResetBackground();
-            CheckCombo();
+            UpdateGameInfo();
         }
 
         public void UpdateDiceBorder(string dice)
@@ -190,6 +198,7 @@ namespace Yatzy
 
         public void UpdateTurn()
         {
+            if (SinglePlayerGame) return;
             _activeplayer = Players.IndexOf(_activeplayer) == 0 ? Players[1] : Players[0];
         }
 
@@ -229,9 +238,9 @@ namespace Yatzy
 
         private void NewRound()
         {
-            _activeplayer.MyTurn = false;
+            //_activeplayer.MyTurn = false;
             if (!SinglePlayerGame) _activeplayer = Players.IndexOf(_activeplayer) == 0 ? Players[1] : Players[0];
-            _activeplayer.MyTurn = true;
+            //_activeplayer.MyTurn = true;
             _activeplayer.Started = false;
             _activeplayer.OutofRolls = true;
             _activeplayer._numberofrolls = 4;
@@ -246,7 +255,7 @@ namespace Yatzy
             {
                 if (b.Tag is not Dice d) return;
                 d.Issaved = !d.Issaved;
-                _lobby.UpdateDiceBorder((_activeplayer.Dices.IndexOf(d), d.Issaved));
+                if (!SinglePlayerGame) _lobby.UpdateDiceBorder((_activeplayer.Dices.IndexOf(d), d.Issaved));
                 //var index = _activeplayer.Dices.IndexOf(d);
                 //if (index < 0) return;
                 ////_activeplayer.IsDiceSaved[index] = !_activeplayer.IsDiceSaved[index];
@@ -496,7 +505,7 @@ namespace Yatzy
 
         private void AddScore_Click(object sender, RoutedEventArgs e)
         {
-            if (Players.IndexOf(_activeplayer) != _myplayer) return;
+            if (!SinglePlayerGame && Players.IndexOf(_activeplayer) != _myplayer) return;
             //if (sender is Button b && b.DataContext is Player player && !player.Equals(_activeplayer)) return;
             if (sender is Button b && b.DataContext is PointsClass points)
             {
@@ -506,15 +515,18 @@ namespace Yatzy
                 points.RightButtonEnabled = false;
                 points.HasPoints = true;
                 AddPoints(points);
-                _lobby.UpdatePoints(_activeplayer.Points);
-                _lobby.UpdateTurn();
+                if (!SinglePlayerGame)
+                {
+                    _lobby.UpdatePoints(_activeplayer.Points);
+                    _lobby.UpdateTurn();
+                }
                 NewRound();
             }
         }
 
         private void StrikeScore_Click(object sender, RoutedEventArgs e)
         {
-            if (Players.IndexOf(_activeplayer) != _myplayer) return;
+            if (!SinglePlayerGame && Players.IndexOf(_activeplayer) != _myplayer) return;
             if (sender is Button b && b.DataContext is PointsClass points)
             {
                 if (_activeplayer.Dices.Count == 0) return;
@@ -524,8 +536,11 @@ namespace Yatzy
                 points.RightButtonEnabled = false;
                 points.HasPoints = true;
                 points.Point = 0;
-                _lobby.UpdatePoints(_activeplayer.Points);
-                _lobby.UpdateTurn();
+                if (!SinglePlayerGame)
+                {
+                    _lobby.UpdatePoints(_activeplayer.Points);
+                    _lobby.UpdateTurn();
+                }
                 NewRound();
             }
         }
