@@ -182,7 +182,7 @@ namespace Yatzy
         private void NewGame_Click(object sender, RoutedEventArgs e)
         {
             if (!_activeplayer.Equals(_myplayer)) return;
-            if (sender is Button b && b.DataContext is Player player && !player.Equals(_activeplayer)) return;
+            if (sender is Button button && button.DataContext is Player player && !player.Equals(_activeplayer)) return;
 
             _activeplayer.ResetBackground();
             RollDices();
@@ -202,16 +202,22 @@ namespace Yatzy
 
         private void Border_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (!_activeplayer.Equals(Players[0])) return;
+            if (!_activeplayer.Equals(_myplayer)) return;
+            if (sender is Border b && b.DataContext is Dice dice && _activeplayer.Equals(Players.FirstOrDefault(x => x.Dices.Contains(dice))))
+            {
+                if (b.Tag is not Dice d) return;
+                d.Issaved = !d.Issaved;
+                var index = _activeplayer.Dices.IndexOf(d);
+                //if (index < 0) return;
+                //_activeplayer.IsDiceSaved[index] = !_activeplayer.IsDiceSaved[index];
+                _lobby.UpdatePlayer(Players);
+            }
 
-            Border? b = sender as Border;
-            if (b == null) return;
-            if (b.Tag is not Dice d) return;
-            d.Issaved = !d.Issaved;
-            var index = _activeplayer.Dices.IndexOf(d);
-            //if (index < 0) return;
-            //_activeplayer.IsDiceSaved[index] = !_activeplayer.IsDiceSaved[index];
-            _lobby.UpdatePlayer(Players);
+            //Border? b = sender as Border;
+            //if (b == null) return;
+            //var dice = b.DataContext as Dice;
+            //if (dice == null) return;
+            
         }
 
 
@@ -451,6 +457,8 @@ namespace Yatzy
 
         private void AddScore_Click(object sender, RoutedEventArgs e)
         {
+            if (!_activeplayer.Equals(_myplayer)) return;
+            if (sender is Button b && b.DataContext is Player player && !player.Equals(_activeplayer)) return;
             if (sender is Button b && b.DataContext is PointsClass points)
             {
                 points.BakGrund = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#9bf29f"));
