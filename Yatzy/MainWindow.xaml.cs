@@ -156,9 +156,9 @@ namespace Yatzy
             }
         }
 
-        public static void CopyProperties<T>(T source, T destination)
+        public static void CopyProperties<T>(T source, T destination, params string[] propertiesToSkip)
         {
-            var props = typeof(T).GetProperties().Where(p => p.CanRead && p.CanWrite);
+            var props = typeof(T).GetProperties().Where(p => p.CanRead && p.CanWrite && !propertiesToSkip.Contains(p.Name));
             foreach (var prop in props)
             {
                 var value = prop.GetValue(source);
@@ -172,7 +172,7 @@ namespace Yatzy
             var updatedPlayers = JsonConvert.DeserializeObject<ObservableCollection<Player>>(players);
             for (int i = 0; i<Players.Count; i++)
             {
-                CopyProperties(updatedPlayers[i], Players[i]);
+                CopyProperties(updatedPlayers[i], Players[i], "Points", "Dices");
                 for (int j = 0; j < Players[i].Dices.Count; j++)
                 {
                     CopyProperties(updatedPlayers[i].Dices[j], Players[i].Dices[j]);
