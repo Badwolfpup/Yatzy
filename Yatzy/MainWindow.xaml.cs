@@ -171,6 +171,7 @@ namespace Yatzy
         public void UpdateDiceValue(string dice)
         {
             var updateddice = JsonConvert.DeserializeObject<List<int>>(dice);
+            if (_activeplayer.Dices == null) _activeplayer.InititalizeDices();
             for (int i = 0; i < updateddice.Count; i++)
             {
                 _activeplayer.Dices[i].UpdateDice(updateddice[i]);
