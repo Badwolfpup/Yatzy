@@ -42,7 +42,6 @@ namespace Yatzy
                 }
             }
         }
-
         public string PlusMinus
         {
             get => _plusminus;
@@ -55,7 +54,6 @@ namespace Yatzy
                 }
             }
         }
-
         public FontWeight Font
         {
             get => _font;

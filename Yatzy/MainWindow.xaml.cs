@@ -195,35 +195,26 @@ namespace Yatzy
             }
         }
 
-        public static void CopyProperties<T>(T source, T destination, params string[] propertiesToSkip)
-        {
-            var props = typeof(T).GetProperties().Where(p => p.CanRead && p.CanWrite && !propertiesToSkip.Contains(p.Name));
-            foreach (var prop in props)
-            {
-                var value = prop.GetValue(source);
-                prop.SetValue(destination, value);
-            }
-        }  
+
 
         public void UpdatePoints(string points)
         {
             var updatedpoints = JsonConvert.DeserializeObject<ObservableCollection<PointsClass>>(points);
-            CopyProperties(updatedpoints, _activeplayer.Points);
 
-            //var index = Players.IndexOf(_activeplayer);
-            //Players.Clear();
-            //foreach (var item in json)
-            //{
-            //    Players.Add(item);
-            //}
-            //_activeplayer = Players[index];
-            //_activeplayer.Dices.Clear();    
-            //for (int i = 0; i < json.Count; i++)
-            //{
-            //    _activeplayer.Dices.Add(new Dice());
-            //    _activeplayer.Dices[i].UpdateDice(nums[i], saves[i]);
-            //    _activeplayer.Dices[i].UpdateBorderColor(saves[i]);
-            //}
+            for (int i = 0; i < Math.Min(updatedpoints.Count, _activeplayer.Points.Count); i++)
+            {
+                _activeplayer.Points[i].Point = updatedpoints[i].Point;
+                _activeplayer.Points[i].PlusMinus = updatedpoints[i].PlusMinus;
+                _activeplayer.Points[i].Font = updatedpoints[i].Font;
+                _activeplayer.Points[i].FontColor = updatedpoints[i].FontColor;
+                _activeplayer.Points[i].HasPoints = updatedpoints[i].HasPoints;
+                _activeplayer.Points[i].LeftButtonEnabled = updatedpoints[i].LeftButtonEnabled;
+                _activeplayer.Points[i].RightButtonEnabled = updatedpoints[i].RightButtonEnabled;
+                _activeplayer.Points[i].CanSelect = updatedpoints[i].CanSelect;
+                _activeplayer.Points[i].ShowButton = updatedpoints[i].ShowButton;
+                _activeplayer.Points[i].IsBonus = updatedpoints[i].IsBonus;
+                _activeplayer.Points[i].BakGrund = updatedpoints[i].BakGrund;
+            }
         }
 
         private void LoadImageNumberOfRolls(int rolls)
