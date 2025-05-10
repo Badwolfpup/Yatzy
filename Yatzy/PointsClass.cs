@@ -28,7 +28,7 @@ namespace Yatzy
         private SolidColorBrush _bakgrund = new SolidColorBrush(Colors.AntiqueWhite);
         #endregion
 
-        #region Public INotifyPropertyChanged   
+        #region Public Properties   
         public int? Point
         {
             get => _point;

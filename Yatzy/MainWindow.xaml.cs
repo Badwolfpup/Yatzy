@@ -156,16 +156,38 @@ namespace Yatzy
             }
         }
 
+        public static void CopyProperties<T>(T source, T destination)
+        {
+            var props = typeof(T).GetProperties().Where(p => p.CanRead && p.CanWrite);
+            foreach (var prop in props)
+            {
+                var value = prop.GetValue(source);
+                prop.SetValue(destination, value);
+            }
+        }
+
         public void UnPackPlayers(string players)
         {
-            var index = Players.IndexOf(_activeplayer);
-            var json = JsonConvert.DeserializeObject<ObservableCollection<Player>>(players);
-            Players.Clear();
-            foreach (var item in json)
+            //var index = Players.IndexOf(_activeplayer);
+            var updatedPlayers = JsonConvert.DeserializeObject<ObservableCollection<Player>>(players);
+            for (int i = 0; i<Players.Count; i++)
             {
-                Players.Add(item);
+                CopyProperties(updatedPlayers[i], Players[i]);
+                for (int j = 0; j < Players[i].Dices.Count; j++)
+                {
+                    CopyProperties(updatedPlayers[i].Dices[j], Players[i].Dices[j]);
+                }
+                for (int j = 0; j < Players[i].Points.Count; j++)
+                {
+                    CopyProperties(updatedPlayers[i].Points[j], Players[i].Points[j]);
+                }
             }
-            _activeplayer = Players[index];
+            //Players.Clear();
+            //foreach (var item in json)
+            //{
+            //    Players.Add(item);
+            //}
+            //_activeplayer = Players[index];
             //_activeplayer.Dices.Clear();    
             //for (int i = 0; i < json.Count; i++)
             //{
@@ -208,10 +230,10 @@ namespace Yatzy
             {
                 if (b.Tag is not Dice d) return;
                 d.Issaved = !d.Issaved;
-                var index = _activeplayer.Dices.IndexOf(d);
-                //if (index < 0) return;
-                //_activeplayer.IsDiceSaved[index] = !_activeplayer.IsDiceSaved[index];
                 _lobby.UpdatePlayer(Players);
+                //var index = _activeplayer.Dices.IndexOf(d);
+                //if (index < 0) return;
+                ////_activeplayer.IsDiceSaved[index] = !_activeplayer.IsDiceSaved[index];
             }
 
             //Border? b = sender as Border;
