@@ -115,7 +115,7 @@ namespace Yatzy
             }
             if (_activeplayer.Points.All(x => x.HasPoints) && !_newgame)
             {
-                CheckHighscore();
+                //CheckHighscore();
                 _activeplayer.StartButton = $"pack://application:,,,/Images/playagain.png";
                 _newgame = true;
                 return;
@@ -289,7 +289,7 @@ namespace Yatzy
                     item.BakGrund = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#9bbbf2"));
                 }
             }
-            CheckBonus();
+            
         }
 
 
@@ -505,6 +505,11 @@ namespace Yatzy
 
         private void Return_Lobby_Click(object sender, RoutedEventArgs e)
         {
+            if  (!SinglePlayerGame && Players.Count > 1 && !Players.All(x => x.Points.All(y => y.HasPoints)))
+            {
+                MessageBoxResult result = MessageBox.Show("Vill du verkligen avbryta spelat och gå tillbaka till lobbyn?", "Avsluta", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.No) return;
+            }
             _closedapp = false;
             Close();
             _closedapp = true;
@@ -523,6 +528,7 @@ namespace Yatzy
                 points.RightButtonEnabled = false;
                 points.HasPoints = true;
                 AddPoints(points);
+                CheckBonus();
                 if (!SinglePlayerGame)
                 {
                     _lobby.UpdatePoints(_activeplayer.Points);
