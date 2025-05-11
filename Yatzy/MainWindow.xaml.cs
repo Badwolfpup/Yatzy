@@ -541,9 +541,9 @@ namespace Yatzy
                 if (!SinglePlayerGame)
                 {
                     _lobby.UpdatePoints(_activeplayer.Points);
-                    //_lobby.UpdateTurn();
+                    _lobby.UpdateTurn();
                 }
-                NewRound();
+                else NewRound();
             }
         }
     }
