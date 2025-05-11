@@ -204,7 +204,7 @@ namespace Yatzy
             _activeplayer.StartButton = $"pack://application:,,,/Images/notyourturn.png";
             NewRound();
         }
-
+        //.
         public void PlayerLeft()
         {
             MessageBox.Show("Motspelaren har lämnat spelet, spelet avslutas nu.");
