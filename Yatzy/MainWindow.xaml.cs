@@ -551,25 +551,26 @@ namespace Yatzy
                 {
                     _lobby.UpdatePoints(_activeplayer.Points);
                     _lobby.UpdateTurn();
-                } 
-                else if (Players.All(x => x.Points.All(y => y.HasPoints)))
-                {
-                    if (Players[_myplayer].Points.Sum(x => x.Point) > Players[_opponent].Points.Sum(x => x.Point))
+
+                    if (Players.All(x => x.Points.All(y => y.HasPoints)))
                     {
-                        MessageBox.Show("Du vann!");
+                        if (Players[_myplayer].Points.Sum(x => x.Point) > Players[_opponent].Points.Sum(x => x.Point))
+                        {
+                            MessageBox.Show("Du vann!");
+                        }
+                        else if (Players[_myplayer].Points.Sum(x => x.Point) < Players[_opponent].Points.Sum(x => x.Point))
+                        {
+                            MessageBox.Show("Du förlorade!");
+                        }
+                        else
+                        {
+                            MessageBox.Show("Oavgjort!");
+                        }
+                        _lobby.InQueue = false;
+                        _lobby.RandomOpponentButton = "Random opponent";
+                        _lobby.GameFinished();
+                        ShowLobby();
                     }
-                    else if (Players[_myplayer].Points.Sum(x => x.Point) < Players[_opponent].Points.Sum(x => x.Point))
-                    {
-                        MessageBox.Show("Du förlorade!");
-                    }
-                    else
-                    {
-                        MessageBox.Show("Oavgjort!");
-                    }
-                    _lobby.InQueue = false;
-                    _lobby.RandomOpponentButton = "Random opponent";
-                    _lobby.GameFinished();
-                    ShowLobby();
                 }
                 else NewRound();
             }
@@ -591,25 +592,26 @@ namespace Yatzy
                 {
                     _lobby.UpdatePoints(_activeplayer.Points);
                     _lobby.UpdateTurn();
-                }
-                else if (Players.All(x => x.Points.All(y => y.HasPoints)))
-                {
-                    if (Players[_myplayer].Points.Sum(x => x.Point) > Players[_opponent].Points.Sum(x => x.Point))
+
+                    if (Players.All(x => x.Points.All(y => y.HasPoints)))
                     {
-                        MessageBox.Show("Du vann!");
+                        if (Players[_myplayer].Points.Sum(x => x.Point) > Players[_opponent].Points.Sum(x => x.Point))
+                        {
+                            MessageBox.Show("Du vann!");
+                        }
+                        else if (Players[_myplayer].Points.Sum(x => x.Point) < Players[_opponent].Points.Sum(x => x.Point))
+                        {
+                            MessageBox.Show("Du förlorade!");
+                        }
+                        else
+                        {
+                            MessageBox.Show("Oavgjort!");
+                        }
+                        _lobby.InQueue = false;
+                        _lobby.RandomOpponentButton = "Random opponent";
+                        _lobby.GameFinished();
+                        ShowLobby();
                     }
-                    else if (Players[_myplayer].Points.Sum(x => x.Point) < Players[_opponent].Points.Sum(x => x.Point))
-                    {
-                        MessageBox.Show("Du förlorade!");
-                    }
-                    else
-                    {
-                        MessageBox.Show("Oavgjort!");
-                    }
-                    _lobby.InQueue = false;
-                    _lobby.RandomOpponentButton = "Random opponent";
-                    _lobby.GameFinished();
-                    ShowLobby();
                 }
                 else NewRound();
             }
