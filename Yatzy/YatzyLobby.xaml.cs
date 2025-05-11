@@ -158,6 +158,14 @@ namespace Yatzy
                 });
             });
 
+            _connection.On<string>("PlayerDisconnected", (username) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    ChatMessages.Add(new ChatMessage { Sender = "System", Message = $"{username} left the lobby!" });
+                });
+            });
+
             _connection.On<object[]>("UpdatePlayerList", (playerlist) =>
             {
                 Dispatcher.Invoke(() =>
