@@ -112,6 +112,7 @@ namespace Yatzy
                     });
                 }
             };
+            //OpenConnection();
         }
 
 
@@ -329,6 +330,11 @@ namespace Yatzy
             _connection.InvokeAsync("AnswerToInvite", answer, id);
         }
 
+        public async Task GameFinished()
+        {
+            _connection.InvokeAsync("GameFinished");
+        }
+
         private async Task OpenNickName()
         {
             NickName popup = new NickName
@@ -342,10 +348,13 @@ namespace Yatzy
 
             OpenConnection();
         }
+
+
         private async Task TryConnectAsync()
         {
             cancellationToken = cancellationTokenSource.Token;
             var retryUntil = DateTime.UtcNow.AddMinutes(1);
+            
             IsConnected = false;
             while (_connection.State != HubConnectionState.Connected)
             {
@@ -382,7 +391,7 @@ namespace Yatzy
                                 ChatMessages.Add(new ChatMessage { Sender = "System", Message = $"Connection established: {_connection.State}" });
                             });
 
-                            await _connection.InvokeAsync("JoinLobby", _username, cancellationToken);
+                             await _connection.InvokeAsync("JoinLobby", _username, cancellationToken);
 
                             IsConnected = true;
                             EnableSinglePlayerButton = true;
@@ -420,6 +429,8 @@ namespace Yatzy
                 }
             }
         }
+
+        
 
         private async Task MonitorConnection()
         {
@@ -536,6 +547,8 @@ namespace Yatzy
         {
             if (PlayerListbox is ListBox listBox && listBox.SelectedItem is Player selectedPlayer)
             {
+                if (selectedPlayer.UserName == _username) return;
+
                 if (selectedPlayer.Status == Status.Playing)
                 {
                     MessageBox.Show("Player is already in a game");
