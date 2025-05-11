@@ -511,6 +511,7 @@ namespace Yatzy
                 MessageBoxResult result = MessageBox.Show("Vill du verkligen avbryta spelat och gå tillbaka till lobbyn?", "Avsluta", MessageBoxButton.YesNo);
                 if (result == MessageBoxResult.No) return;
             }
+            if (!SinglePlayerGame && Players.Count > 1) Players.Remove(Players[_myplayer]);
             _closedapp = false;
             Close();
             _closedapp = true;
