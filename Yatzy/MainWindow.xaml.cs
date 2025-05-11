@@ -208,6 +208,8 @@ namespace Yatzy
         public void PlayerLeft()
         {
             MessageBox.Show("Motspelaren har lämnat spelet, spelet avslutas nu.");
+            _lobby.InQueue = false;
+            _lobby.RandomOpponentButton = "Random opponent";
             ShowLobby();
         }
 
@@ -518,6 +520,8 @@ namespace Yatzy
             }
             if (!SinglePlayerGame && Players.Count > 1) Players.RemoveAt(_myplayer);
             _lobby.PlayerLeft();
+            _lobby.InQueue = false;
+            _lobby.RandomOpponentButton = "Random opponent";
             ShowLobby();
         }
 
