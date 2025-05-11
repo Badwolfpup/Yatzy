@@ -30,6 +30,7 @@ namespace Yatzy
     public partial class YatzyLobby : Window, INotifyPropertyChanged
     {
         private  HubConnection _connection;
+        private bool _inqueue;
         public string _username = "";
         private MainWindow _mainWindow;
         CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
@@ -46,6 +47,17 @@ namespace Yatzy
         }
 
         private int _connectionattempts = 0;
+
+        private string _randomopponentbutton = "Random opponent";
+        public string RandomOpponentButton
+        {
+            get { return _randomopponentbutton; }
+            set
+            {
+                _randomopponentbutton = value;
+                OnPropertyChanged(nameof(RandomOpponentButton));
+            }
+        }
 
         private bool _isconnected;
         public bool IsConnected
@@ -502,7 +514,18 @@ namespace Yatzy
 
         private void Random_opponent_Click(object sender, RoutedEventArgs e)
         {
-            _connection.InvokeAsync("QueueForGame");
+            if (InQueue)
+            {
+                RandomOpponentButton = "Cancel queue";
+                InQueue = false;
+                _connection.InvokeAsync("LeaveQueue");
+            }
+            else
+            {
+                RandomOpponentButton = "Random opponent";
+                InQueue = true;
+                _connection.InvokeAsync("QueueForGame");
+            }
             //var queueing = new Queueing(this);
             //queueing.Owner = this;
             //queueing.WindowStartupLocation = WindowStartupLocation.CenterOwner;

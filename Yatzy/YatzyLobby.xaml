@@ -60,7 +60,7 @@
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left">
                 <Button x:Name="SinglePlayerButton" Content="Single Player" Width="120" Margin="5" Click="Start_SinglePlayer_Click" IsEnabled="{Binding EnableSinglePlayerButton}"/>
                 <Button x:Name="InvitePlayer" Content="Invite opponent" Width="120" Height="30" Margin="5" Click="Invite_Player_Click" IsEnabled="{Binding IsConnected}"></Button>
-                <Button x:Name="RandomOpponent" Content="Random opponent" Width="120" Height="30" Margin="5" Click="Random_opponent_Click" IsEnabled="{Binding IsConnected}"></Button>
+                <Button x:Name="RandomOpponent" Content="{Binding RandomOpponentButton}" Width="120" Height="30" Margin="5" Click="Random_opponent_Click" IsEnabled="{Binding IsConnected}"></Button>
 
             </StackPanel>
             <Button Grid.Row="2" HorizontalAlignment="Right" Content="Send" Width="100" Margin="5" Click="SendMessage_Click" IsEnabled="{Binding IsConnected}"/>
