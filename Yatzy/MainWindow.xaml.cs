@@ -1,5 +1,6 @@
 ﻿using ControlzEx.Standard;
 using MahApps.Metro.Controls;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.ObjectModel;
@@ -36,7 +37,7 @@ namespace Yatzy
             }
             _activeplayer = Players.Count > 0 ? Players[0] : new Player();
             _activeplayer.InitializePoints();
-            //_activeplayer.MyTurn = true;
+            _activeplayer.MyTurn = true;
             DataContext = this;
             Topscorer = Load();
             AddIndex();
@@ -154,6 +155,7 @@ namespace Yatzy
             }
             
             if (_activeplayer.Dices == null) _activeplayer.InititalizeDices();
+
             for (int i = 0; i < 5; i++)
             {
                 //if (!_activeplayer.Dices[i].Issaved)
@@ -238,9 +240,9 @@ namespace Yatzy
 
         private void NewRound()
         {
-            //_activeplayer.MyTurn = false;
+            _activeplayer.MyTurn = false;
             if (!SinglePlayerGame) _activeplayer = Players.IndexOf(_activeplayer) == 0 ? Players[1] : Players[0];
-            //_activeplayer.MyTurn = true;
+            _activeplayer.MyTurn = true;
             _activeplayer.Started = false;
             _activeplayer.OutofRolls = true;
             _activeplayer._numberofrolls = 4;
