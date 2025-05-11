@@ -14,6 +14,7 @@
         <local:HideBonusButton x:Key="HideBonusButton"/>
         <local:CalculatePlusMinus x:Key="CalculatePlusMinus"/>
         <local:ShowBonusText x:Key="ShowBonusText"/>
+        <local:HideAddButton x:Key="HideAddButton"/>
     </mah:MetroWindow.Resources>       
     <Grid Margin="20">
 
@@ -106,7 +107,11 @@
                                                     <ColumnDefinition Width="auto"></ColumnDefinition>
                                                 </Grid.ColumnDefinitions>
                                                 <TextBlock Grid.Column="0" Height="25" Text="{Binding Name}" FontWeight="{Binding Font}" Foreground="{Binding FontColor}" VerticalAlignment="Center" Padding="5 0 0 0" FontSize="16"></TextBlock>
-                                                <Button Grid.Column="1" Width="30" Height="25" FontFamily="Segoe UI" Content="&#x2714;" Foreground="ForestGreen" Margin="0 5 0 5" Click="AddScore_Click" IsEnabled="{Binding LeftButtonEnabled}" Visibility="{Binding ShowButton, Converter={StaticResource HideButton}}"></Button>
+                                                <Button Grid.Column="1" Width="30" Height="25" FontFamily="Segoe UI" Content="&#x2714;" Foreground="ForestGreen" Margin="0 5 0 5" Click="AddScore_Click" IsEnabled="{Binding LeftButtonEnabled}" >
+                                                    <Button.Visibility>
+                                                        <Binding Path="." Converter="{StaticResource HideAddButton}"></Binding>
+                                                    </Button.Visibility>
+                                                </Button>
                                                 <TextBlock Margin="10 0 10 0" Height="25" Text="{Binding Point}" Width="30" Grid.Column="2" FontWeight="{Binding Font}" TextAlignment="Center" VerticalAlignment="Center" FontSize="16"/>
                                                 <Button Grid.Column="3" Width="30" Height="25" FontFamily="Segoe UI" Content="&#x274C;" Foreground="Red" IsEnabled="{Binding RightButtonEnabled}" Click="StrikeScore_Click">
                                                     <Button.Visibility>
