@@ -267,6 +267,11 @@ namespace Yatzy
             _connection.InvokeAsync("UpdateTurn");
         }
 
+        public async Task PlayerLeft()
+        {
+            _connection.InvokeAsync("PlayerLeft");
+        }
+
         public async Task UpdatePoints(ObservableCollection<PointsClass> points)
         {
             var json = JsonConvert.SerializeObject(points, new JsonSerializerSettings

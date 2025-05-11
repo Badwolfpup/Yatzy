@@ -517,6 +517,7 @@ namespace Yatzy
                 if (result == MessageBoxResult.No) return;
             }
             if (!SinglePlayerGame && Players.Count > 1) Players.RemoveAt(_myplayer);
+            _lobby.PlayerLeft();
             ShowLobby();
         }
 
