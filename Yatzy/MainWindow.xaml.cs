@@ -201,6 +201,7 @@ namespace Yatzy
         public void UpdateTurn()
         {
             if (SinglePlayerGame) return;
+            _activeplayer.StartButton = $"pack://application:,,,/Images/notyourturn.png";
             NewRound();
         }
 
@@ -240,6 +241,11 @@ namespace Yatzy
 
         private void NewRound()
         {
+            foreach (var item in _activeplayer.Dices)
+            {
+                item.Issaved = false;
+            }
+
             _activeplayer.MyTurn = false;
             if (!SinglePlayerGame) _activeplayer = Players.IndexOf(_activeplayer) == 0 ? Players[1] : Players[0];
             _activeplayer.MyTurn = true;
