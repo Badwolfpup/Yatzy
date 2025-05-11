@@ -514,17 +514,18 @@ namespace Yatzy
 
         private void Random_opponent_Click(object sender, RoutedEventArgs e)
         {
-            if (InQueue)
+            
+            if (!InQueue)
             {
                 RandomOpponentButton = "Cancel queue";
-                InQueue = false;
-                _connection.InvokeAsync("LeaveQueue");
+                InQueue = true;
+                _connection.InvokeAsync("QueueForGame");
             }
             else
             {
                 RandomOpponentButton = "Random opponent";
-                InQueue = true;
-                _connection.InvokeAsync("QueueForGame");
+                InQueue = false;
+                _connection.InvokeAsync("LeaveQueue");
             }
             //var queueing = new Queueing(this);
             //queueing.Owner = this;
