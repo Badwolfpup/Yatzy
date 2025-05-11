@@ -169,6 +169,13 @@ namespace Yatzy
             {
                 Points[i].IsBonus = true;
             }
+            var chans = Points.Where(x => x.Name == "Chans").FirstOrDefault();
+            if (chans != null || chans != default)
+            {
+                chans.ShowButton = true;
+                chans.IsBonus = true;
+            }
+
             _summa = Points.Where(x => x.Name == "Summa:").FirstOrDefault();
             _summa = Points.Where(x => x.Name == "Summa:").FirstOrDefault();
             _summa.ShowButton = false;
