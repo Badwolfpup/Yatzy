@@ -205,6 +205,11 @@ namespace Yatzy
             NewRound();
         }
 
+        public void PlayerLeft()
+        {
+            MessageBox.Show("Motspelaren har lämnat spelet, spelet avslutas nu.");
+            ShowLobby();
+        }
 
 
         public void UpdatePoints(string points)
@@ -512,6 +517,11 @@ namespace Yatzy
                 if (result == MessageBoxResult.No) return;
             }
             if (!SinglePlayerGame && Players.Count > 1) Players.RemoveAt(_myplayer);
+            ShowLobby();
+        }
+
+        private void ShowLobby()
+        {
             _closedapp = false;
             Close();
             _closedapp = true;

@@ -226,6 +226,13 @@ namespace Yatzy
                 });
             });
 
+            _connection.On("PlayerLeft", () => {
+                Dispatcher.Invoke(() =>
+                 {
+                     _mainWindow.PlayerLeft();
+                 });
+            });
+
             Task.Run(() => TryConnectAsync());
 
         }
