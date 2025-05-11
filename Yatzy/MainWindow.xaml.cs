@@ -246,7 +246,7 @@ namespace Yatzy
             _activeplayer.Started = false;
             _activeplayer.OutofRolls = true;
             _activeplayer._numberofrolls = 4;
-            RollDices();
+            if (Players.IndexOf(_activeplayer) == _myplayer) RollDices();
         }
 
 
