@@ -234,6 +234,7 @@ namespace Yatzy
 
         private void NewGame_Click(object sender, RoutedEventArgs e)
         {
+            if (_activeplayer._numberofrolls <= 0) return;
             if (Players.IndexOf(_activeplayer) != _myplayer) return;
             if (sender is Button button && button.DataContext is Player player && !player.Equals(_activeplayer)) return;
             RollDices();
