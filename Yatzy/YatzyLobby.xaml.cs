@@ -269,6 +269,14 @@ namespace Yatzy
                  });
             });
 
+            _connection.On("GameFinished", () =>
+            {
+                Dispatcher.Invoke(() =>
+                 {
+                     _mainWindow.GameFinished();
+                 });
+            });
+
             Task.Run(() => TryConnectAsync());
 
         }

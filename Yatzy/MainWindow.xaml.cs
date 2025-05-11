@@ -213,6 +213,15 @@ namespace Yatzy
             ShowLobby();
         }
 
+        public void GameFinished()
+        {
+            if (SinglePlayerGame) return;
+            _lobby.InQueue = false;
+            _lobby.RandomOpponentButton = "Random opponent";
+            CheckWinner();
+            ShowLobby();
+        }
+
 
 
         public void UpdatePoints(string points)
@@ -554,21 +563,10 @@ namespace Yatzy
 
                     if (Players.All(x => x.Points.All(y => y.HasPoints)))
                     {
-                        if (Players[_myplayer].Points.Sum(x => x.Point) > Players[_opponent].Points.Sum(x => x.Point))
-                        {
-                            MessageBox.Show("Du vann!");
-                        }
-                        else if (Players[_myplayer].Points.Sum(x => x.Point) < Players[_opponent].Points.Sum(x => x.Point))
-                        {
-                            MessageBox.Show("Du förlorade!");
-                        }
-                        else
-                        {
-                            MessageBox.Show("Oavgjort!");
-                        }
                         _lobby.InQueue = false;
                         _lobby.RandomOpponentButton = "Random opponent";
                         _lobby.GameFinished();
+                        CheckWinner();
                         ShowLobby();
                     }
                 }
@@ -595,25 +593,30 @@ namespace Yatzy
 
                     if (Players.All(x => x.Points.All(y => y.HasPoints)))
                     {
-                        if (Players[_myplayer].Points.Sum(x => x.Point) > Players[_opponent].Points.Sum(x => x.Point))
-                        {
-                            MessageBox.Show("Du vann!");
-                        }
-                        else if (Players[_myplayer].Points.Sum(x => x.Point) < Players[_opponent].Points.Sum(x => x.Point))
-                        {
-                            MessageBox.Show("Du förlorade!");
-                        }
-                        else
-                        {
-                            MessageBox.Show("Oavgjort!");
-                        }
                         _lobby.InQueue = false;
                         _lobby.RandomOpponentButton = "Random opponent";
                         _lobby.GameFinished();
+                        CheckWinner();
                         ShowLobby();
                     }
                 }
                 else NewRound();
+            }
+        }
+
+        private void CheckWinner()
+        {
+            if (Players[_myplayer].Points.Sum(x => x.Point) > Players[_opponent].Points.Sum(x => x.Point))
+            {
+                MessageBox.Show("Du vann!");
+            }
+            else if (Players[_myplayer].Points.Sum(x => x.Point) < Players[_opponent].Points.Sum(x => x.Point))
+            {
+                MessageBox.Show("Du förlorade!");
+            }
+            else
+            {
+                MessageBox.Show("Oavgjort!");
             }
         }
     }
