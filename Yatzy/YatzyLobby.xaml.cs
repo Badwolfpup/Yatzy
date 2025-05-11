@@ -252,6 +252,22 @@ namespace Yatzy
                  });
             });
 
+            _connection.On<string, string>("InvitePlayer", (id, username) =>
+            {
+                Dispatcher.Invoke(() =>
+                 {
+                     InvitePlayer(id, username);
+                 });
+            });
+
+            _connection.On<string>("RejectedInvite", (username) =>
+            {
+                Dispatcher.Invoke(() =>
+                 {
+                     RejectedInvite(username);
+                 });
+            });
+
             Task.Run(() => TryConnectAsync());
 
         }
@@ -301,6 +317,16 @@ namespace Yatzy
                 }
             });
             _connection.InvokeAsync("UpdatePoints", json);
+        }
+
+        public async Task InvitePlayer(string username)
+        {
+            _connection.InvokeAsync("InvitePlayer", username);
+        }
+
+        public async Task AnswerToInvite(bool answer, string id)
+        {
+            _connection.InvokeAsync("AnswerToInvite", answer, id);
         }
 
         private async Task OpenNickName()
@@ -464,18 +490,17 @@ namespace Yatzy
                 });
             }
         }
-        //protected override async void OnClosing(CancelEventArgs e)
-        //{
-        //    base.OnClosing(e);
-        //    cancellationTokenSource.Cancel(); // Cancel any running tasks
-        //    try
-        //    {
-        //        await _connection.StopAsync(); // Gracefully stop the connection
-        //        await _connection.DisposeAsync(); // Dispose connection asynchronously
-        //    }
-        //    catch { }
-        //    cancellationTokenSource.Dispose(); // Dispose cancellation token
-        //}
+
+        public void InvitePlayer(string id, string user)
+        {
+            bool result = MessageBox.Show($"Do you want to play with {user}?", "Invite", MessageBoxButton.YesNo) == MessageBoxResult.Yes;
+            _connection.InvokeAsync("AnswerToInvite", result, id);
+        }
+
+        public void RejectedInvite(string user)
+        {
+            MessageBox.Show($"{user} rejected your invite", "Invite", MessageBoxButton.OK);
+        }
 
         private async void SendMessage_Click(object sender, RoutedEventArgs e)
         {
@@ -509,6 +534,15 @@ namespace Yatzy
 
         private void Invite_Player_Click(object sender, RoutedEventArgs e)
         {
+            if (PlayerListbox is ListBox listBox && listBox.SelectedItem is Player selectedPlayer)
+            {
+                if (selectedPlayer.Status == Status.Playing)
+                {
+                    MessageBox.Show("Player is already in a game");
+                    return;
+                }
+                _connection.InvokeAsync("InvitePlayer", selectedPlayer.UserName);
+            }
         }
 
         private void Random_opponent_Click(object sender, RoutedEventArgs e)
@@ -526,10 +560,6 @@ namespace Yatzy
                 InQueue = false;
                 _connection.InvokeAsync("LeaveQueue");
             }
-            //var queueing = new Queueing(this);
-            //queueing.Owner = this;
-            //queueing.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            //queueing.ShowDialog();
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
@@ -540,15 +570,6 @@ namespace Yatzy
             }
         }
 
-        private void ShowToolTip_Click(object sender, RoutedEventArgs e)
-        {
-            //Dispatcher.BeginInvoke(new Action(() =>
-            //{
-            //    double targetWidth = MultiPlayerButton.ActualWidth;
-            //    double popupWidth = MultiPlayerPopUp.ActualWidth;
-            //    MultiPlayerPopUp.HorizontalOffset = (targetWidth - popupWidth) / 2;
-            //}), DispatcherPriority.Loaded);
-        }
     }
 
     

@@ -214,6 +214,7 @@ namespace Yatzy
         }
 
 
+
         public void UpdatePoints(string points)
         {
             var updatedpoints = JsonConvert.DeserializeObject<ObservableCollection<PointsClass>>(points);

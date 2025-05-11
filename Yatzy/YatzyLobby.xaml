@@ -12,7 +12,7 @@
         <Border Grid.Column="0" BorderBrush="Gray" BorderThickness="1" Margin="5">
             <StackPanel>
                 <TextBlock Text="Online Players" FontWeight="Bold" Margin="5"/>
-                <ListBox ItemsSource="{Binding Players}" Height="350">
+                <ListBox x:Name="PlayerListbox" ItemsSource="{Binding Players}" Height="350">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
