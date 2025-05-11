@@ -175,7 +175,7 @@ namespace Yatzy
             {
                 Dispatcher.Invoke(() =>
                 {
-                    ChatMessages.Add(new ChatMessage { Sender = sender, Message = message });
+                    ChatMessages.Add(new ChatMessage { Sender = "System", Message = message });
                 });
             });
 
