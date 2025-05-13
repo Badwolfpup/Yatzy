@@ -195,7 +195,6 @@ namespace Yatzy
         {
             var updateddice = JsonConvert.DeserializeObject<(int index, bool border)>(dice);
             _activeplayer.Dices[updateddice.index].Issaved = updateddice.border;
-
         }
 
         public void UpdateTurn()

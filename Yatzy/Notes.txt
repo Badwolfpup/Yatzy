@@ -1,15 +1,10 @@
-﻿Fixa layout för Yatzy - border för vissa controls i listan +  storlek
+﻿Fixa att bara spelarna i gamet får info om vad som händer i gamet
+Fixa +- points om man inte har någon av valören
 
-Installera email-server på serverna
-Skapa Yatzy-databas
-Inloggningssida
-	- inloggning via email
-	- val av nick första gången - sparas på databas
-
-Multiplayer
+//Multiplayer
 	- random opponents -> servern håller lista med spelare
 	- utmana spelare - serverna skickar inbjudning till spelaren (POPUP JA/NEJ)
 
-Skapa multiplayer layout
+//Skapa multiplayer layout
 
 Skapa någon form av animation för när tärning kastas
