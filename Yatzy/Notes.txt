@@ -1,4 +1,4 @@
-﻿Fixa att bara spelarna i gamet får info om vad som händer i gamet
+﻿//Fixa att bara spelarna i gamet får info om vad som händer i gamet
 Fixa +- points om man inte har någon av valören
 
 //Multiplayer

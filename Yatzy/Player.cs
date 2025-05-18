@@ -88,19 +88,8 @@ namespace Yatzy
             }
         }
 
-        private bool _canspin;
-        public bool CanSpin
-        {
-            get => _canspin;
-            set
-            {
-                if (_canspin != value)
-                {
-                    _canspin = value;
-                    OnPropertyChanged(nameof(CanSpin));
-                }
-            }
-        }
+
+
 
         private bool _myturn;
         public bool MyTurn
@@ -154,7 +143,7 @@ namespace Yatzy
                 if (numrolls != value)
                 {
                     numrolls = value;
-                    CanSpin = numrolls > 1 && numrolls <= 4;
+                    //CanSpin = numrolls > 1 && numrolls <= 4;
                     OnPropertyChanged(nameof(_numberofrolls));
                 }
             }

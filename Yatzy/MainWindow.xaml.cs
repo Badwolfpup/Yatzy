@@ -14,6 +14,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 
 namespace Yatzy
 {
@@ -22,7 +23,7 @@ namespace Yatzy
     /// </summary>
     public partial class MainWindow : MetroWindow, INotifyPropertyChanged
     {
-
+        
         private bool _closedapp = true;
 
         public MainWindow(YatzyLobby lobby, ObservableCollection<Player> players)
@@ -42,6 +43,7 @@ namespace Yatzy
             DataContext = this;
             Topscorer = Load();
             AddIndex();
+            LoadSoundFile();
             Closing += CloseGame;
         }
 
@@ -101,6 +103,23 @@ namespace Yatzy
             }
         }
 
+        private bool _ismuted;
+        public bool IsMuted
+        {
+            get => _ismuted;
+            set
+            {
+                if (_ismuted != value)
+                {
+                    _ismuted = value;
+                    OnPropertyChanged(nameof(IsMuted));
+                    OnPropertyChanged(nameof(SoundIcon));
+                }
+            }
+        }
+
+        public string SoundIcon => IsMuted ? "\uE198" : "\uE995";
+
         private bool _newgame = false;
         public bool SinglePlayerGame { get; set; } = false;
         #endregion
@@ -156,6 +175,7 @@ namespace Yatzy
             }
             
             if (_activeplayer.Dices == null) _activeplayer.InititalizeDices();
+            if (_activeplayer._numberofrolls >= 1 && _activeplayer._numberofrolls <= 4) RotateDice();
 
             for (int i = 0; i < 5; i++)
             {
@@ -248,27 +268,50 @@ namespace Yatzy
         {
             _activeplayer.StartButton = _activeplayer._numberofrolls != 0 ? $"pack://application:,,,/Images/dice{rolls}.png" : $"pack://application:,,,/Images/redx.png";
         }
+        private MediaPlayer media = new MediaPlayer();
+
+        private void LoadSoundFile()
+        {
+            media.Open(new Uri("pack://siteoforigin:,,,/DiceSounds.mp3"));
+            media.Volume = 0.5;
+            media.MediaFailed += (s, args) => MessageBox.Show($"Couldnt locate sound file: {args.ErrorException.Message}");
+        }
 
         private async void NewGame_Click(object sender, RoutedEventArgs e)
         {
-            if (_activeplayer.CanSpin) RotateDice();
+            
+
             if (_activeplayer._numberofrolls <= 0) return;
             if (Players.IndexOf(_activeplayer) != _myplayer) return;
             if (sender is Button button && button.DataContext is Player player && !player.Equals(_activeplayer)) return;
             RollDices();
         }
 
+        private void AddEffectsToRollDiceButton()
+        {
+            media.Position = TimeSpan.Zero;
+            media.Play();
+        }
+
         private async Task RotateDice()
         {
+            if (!_ismuted) AddEffectsToRollDiceButton();
             var itemscontrol = GameBoardItemsControl;
 
             var container = itemscontrol.ItemContainerGenerator.ContainerFromIndex(0) as FrameworkElement;
-
+            
             if (container != null)
             {
                 var image = FindVisualChild<Image>(container);
                 if (image != null && image.Name == "RollDiceButton")
                 {
+                    image.Effect = new DropShadowEffect() {
+                        Color = Colors.Black,
+                        Direction = 315, // Shadow angle
+                        ShadowDepth = 5,
+                        BlurRadius = 10,
+                        Opacity = 0.5
+                    };
                     var rotateTransform = new RotateTransform(0);
                     image.RenderTransform = rotateTransform;
                     for (int i = 0; i < 20; i++)
@@ -656,6 +699,20 @@ namespace Yatzy
             {
                 MessageBox.Show("Oavgjort!");
             }
+        }
+
+        private void Mute_Button_Click(object sender, RoutedEventArgs e)
+        {
+            IsMuted = !IsMuted;
+            //MuteButton.Content = new TextBlock
+            //{
+            //    FontFamily = new FontFamily("Segoe MDL2 Assets"),
+            //    Text = _ismuted ? "\uE198" : "\uE995", // Muted : Sound
+            //    FontSize = 24,
+            //    HorizontalAlignment = HorizontalAlignment.Center,
+            //    VerticalAlignment = VerticalAlignment.Center
+            //};
+            //MuteButton.Content = _ismuted ? "&#xE995;" : "&#xE198;";
         }
     }
 

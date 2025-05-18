@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="DiceSounds.mp3" />
     <None Remove="Images\dice1.png" />
     <None Remove="Images\dice2.png" />
     <None Remove="Images\dice3.png" />
@@ -29,6 +30,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="DiceSounds.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Resource Include="Images\dice1.png" />
     <Resource Include="Images\dice2.png" />
     <Resource Include="Images\dice3.png" />
