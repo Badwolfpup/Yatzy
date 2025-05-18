@@ -88,6 +88,20 @@ namespace Yatzy
             }
         }
 
+        private bool _canspin;
+        public bool CanSpin
+        {
+            get => _canspin;
+            set
+            {
+                if (_canspin != value)
+                {
+                    _canspin = value;
+                    OnPropertyChanged(nameof(CanSpin));
+                }
+            }
+        }
+
         private bool _myturn;
         public bool MyTurn
         {
@@ -131,7 +145,20 @@ namespace Yatzy
             }
         }
 
-        public int _numberofrolls { get; set; } = 4;
+        private int numrolls = 4;
+        public int _numberofrolls
+        {
+            get => numrolls;
+            set
+            {
+                if (numrolls != value)
+                {
+                    numrolls = value;
+                    CanSpin = numrolls > 1 && numrolls <= 4;
+                    OnPropertyChanged(nameof(_numberofrolls));
+                }
+            }
+        }
         public bool _hasaddedbonus { get; set; } = false;
         private string _username;
         public PointsClass? _total {get; set;}

@@ -8,3 +8,6 @@ Fixa +- points om man inte har någon av valören
 //Skapa multiplayer layout
 
 Skapa någon form av animation för när tärning kastas
+	-ta bort CanSpin och koppla direkt i rolldice
+	-inkludera ljud
+		-toggle för stänga v aljud

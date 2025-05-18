@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -248,12 +249,50 @@ namespace Yatzy
             _activeplayer.StartButton = _activeplayer._numberofrolls != 0 ? $"pack://application:,,,/Images/dice{rolls}.png" : $"pack://application:,,,/Images/redx.png";
         }
 
-        private void NewGame_Click(object sender, RoutedEventArgs e)
+        private async void NewGame_Click(object sender, RoutedEventArgs e)
         {
+            if (_activeplayer.CanSpin) RotateDice();
             if (_activeplayer._numberofrolls <= 0) return;
             if (Players.IndexOf(_activeplayer) != _myplayer) return;
             if (sender is Button button && button.DataContext is Player player && !player.Equals(_activeplayer)) return;
             RollDices();
+        }
+
+        private async Task RotateDice()
+        {
+            var itemscontrol = GameBoardItemsControl;
+
+            var container = itemscontrol.ItemContainerGenerator.ContainerFromIndex(0) as FrameworkElement;
+
+            if (container != null)
+            {
+                var image = FindVisualChild<Image>(container);
+                if (image != null && image.Name == "RollDiceButton")
+                {
+                    var rotateTransform = new RotateTransform(0);
+                    image.RenderTransform = rotateTransform;
+                    for (int i = 0; i < 20; i++)
+                    {
+                        rotateTransform.Angle += 90;
+                        await Task.Delay(20);
+                    }
+                }
+            }
+        }
+
+        private T FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                DependencyObject child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T typedChild)
+                    return typedChild;
+
+                var result = FindVisualChild<T>(child);
+                if (result != null)
+                    return result;
+            }
+            return null;
         }
 
         private void NewRound()
