@@ -175,7 +175,8 @@ namespace Yatzy
             }
             
             if (_activeplayer.Dices == null) _activeplayer.InititalizeDices();
-            if (_activeplayer._numberofrolls >= 1 && _activeplayer._numberofrolls <= 4 && Players.IndexOf(_activeplayer) == _myplayer) RotateDice();
+            if (_activeplayer._numberofrolls >= 1 && _activeplayer._numberofrolls <= 4) RotateDice();
+
 
             for (int i = 0; i < 5; i++)
             {
@@ -191,6 +192,12 @@ namespace Yatzy
 
             if (_activeplayer._numberofrolls <= 0) { _activeplayer.OutofRolls = false; return; }
             
+        }
+
+        public void AnimateDice()
+        {
+            if (_activeplayer._numberofrolls >= 1 && _activeplayer._numberofrolls <= 4 && Players.IndexOf(_activeplayer) == _myplayer) RotateDice();
+
         }
 
         private void UpdateGameInfo()
@@ -287,7 +294,7 @@ namespace Yatzy
             RollDices();
         }
 
-        private void AddEffectsToRollDiceButton()
+        private void AddSoundEffectsToRollDiceButton()
         {
             media.Position = TimeSpan.Zero;
             media.Play();
@@ -295,7 +302,7 @@ namespace Yatzy
 
         private async Task RotateDice()
         {
-            if (!_ismuted) AddEffectsToRollDiceButton();
+            
             var itemscontrol = GameBoardItemsControl;
 
             var container = itemscontrol.ItemContainerGenerator.ContainerFromIndex(0) as FrameworkElement;
@@ -303,8 +310,10 @@ namespace Yatzy
             if (container != null)
             {
                 var image = FindVisualChild<Image>(container);
-                if (image != null && image.Name == "RollDiceButton")
+               
+                if (image != null && image.Name == "RollDiceButton" && image.DataContext == _activeplayer)
                 {
+                    if (!_ismuted) AddSoundEffectsToRollDiceButton();
                     image.Effect = new DropShadowEffect() {
                         Color = Colors.Black,
                         Direction = 315, // Shadow angle

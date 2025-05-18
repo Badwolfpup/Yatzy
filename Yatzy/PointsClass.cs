@@ -34,7 +34,7 @@ namespace Yatzy
             get => _point;
             set
             {
-                if (_point != value)
+                if (_point != value || (value is int x && x == 0))
                 {
                     _point = value;
                     CalculatePlusMinus(0);
