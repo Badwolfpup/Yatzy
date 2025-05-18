@@ -277,6 +277,14 @@ namespace Yatzy
                  });
             });
 
+            _connection.On("AnimateDice", () =>
+            {
+                Dispatcher.Invoke(() =>
+                 {
+                     _mainWindow.AnimateDice();
+                 });
+            });
+
             Task.Run(() => TryConnectAsync());
 
         }
@@ -341,6 +349,11 @@ namespace Yatzy
         public async Task GameFinished()
         {
             _connection.InvokeAsync("GameFinished");
+        }
+
+        public async Task AnimateDice()
+        {
+            _connection.InvokeAsync("AnimateDice");
         }
 
         private async Task OpenNickName()
