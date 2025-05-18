@@ -51,9 +51,66 @@
                                 <StackPanel Orientation="Horizontal">
                                     <Button  Style="{DynamicResource MahApps.Styles.Button.Circle}" BorderThickness="0"  FontSize="24" FontWeight="Bold" Width="50" Margin="0 0 10 0" Height="50" Click="NewGame_Click" IsEnabled="{Binding OutofRolls}">
                                         <Button.Content>
-                                            <Image Source="{Binding StartButton}" x:Name="RollDiceButton" RenderTransformOrigin="0.5,0.5" Width="35" Height="35" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="UniformToFill" ></Image>
-
+                                            <Image Source="{Binding StartButton}" x:Name="RollDiceButton" RenderTransformOrigin="0.5,0.5" Width="35" Height="35" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="UniformToFill" >
+                                                <Image.Resources>
+                                                    <!-- Define Storyboard as a resource -->
+                                                    <Storyboard x:Key="RotationStoryboard">
+                                                        <DoubleAnimation
+                                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                                                            From="0"
+                                                            To="1800" 
+                                                            Duration="0:0:0.4"                                                            
+                                                            RepeatBehavior="1x" />
+                                                    </Storyboard>
+                                                </Image.Resources>
+                                                <Image.Effect>
+                                                    <DropShadowEffect Color="Black" Direction="315" ShadowDepth="5" BlurRadius="10" Opacity="5"></DropShadowEffect>
+                                                </Image.Effect>
+                                                <Image.RenderTransform>
+                                                    <RotateTransform Angle="0" CenterX="0.5" CenterY="0.5" />
+                                                </Image.RenderTransform>
+                                                <Image.Style>
+                                                    
+                                                    <Style TargetType="Image">
+                                                        
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding ShouldAnimate}" Value="True">
+                                                                <DataTrigger.EnterActions>
+                                                                    <BeginStoryboard Storyboard="{StaticResource RotationStoryboard}" />
+                                                                </DataTrigger.EnterActions>
+                                                                <DataTrigger.ExitActions>
+                                                                    <!-- Reset angle when ShouldAnimate is false -->
+                                                                    <BeginStoryboard>
+                                                                        <Storyboard>
+                                                                            <DoubleAnimation
+                                                                                Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                                                                                To="0"
+                                                                                Duration="0:0:0" />
+                                                                        </Storyboard>
+                                                                    </BeginStoryboard>
+                                                                </DataTrigger.ExitActions>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Image.Style>
+                                            </Image>
+                                            
                                         </Button.Content>
+                                        <!--<Button.Triggers>
+                                            <EventTrigger RoutedEvent="Button.Click">
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation
+                                                            Storyboard.TargetName="rotateTransform"
+                                                            Storyboard.TargetProperty="Angle"
+                                                            From="0"
+                                                            To="1800"
+                                                            Duration="0:0:0.2"
+                                                            RepeatBehavior="1x" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                        </Button.Triggers>-->
                                         <!--<Button.Content>
                             <TextBlock FontFamily="Segoe MDL2 Assets" Text="{Binding StartButton}"></TextBlock>
                         </Button.Content>-->

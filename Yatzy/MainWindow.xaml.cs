@@ -175,8 +175,14 @@ namespace Yatzy
             }
             
             if (_activeplayer.Dices == null) _activeplayer.InititalizeDices();
-            if (SinglePlayerGame && _activeplayer._numberofrolls >= 1 && _activeplayer._numberofrolls <= 4) RotateDice();
-            else if (_activeplayer._numberofrolls >= 1 && _activeplayer._numberofrolls <= 4) _lobby.AnimateDice();
+            if (SinglePlayerGame && _activeplayer._numberofrolls >= 1 && _activeplayer._numberofrolls <= 4)
+            {
+                _activeplayer.ShouldAnimate = false;
+                _activeplayer.ShouldAnimate = true;
+                if (!_ismuted) AddSoundEffectsToRollDiceButton();
+            }
+            //RotateDice();
+            //else if (_activeplayer._numberofrolls >= 1 && _activeplayer._numberofrolls <= 4) _lobby.AnimateDice();
 
 
             for (int i = 0; i < 5; i++)
@@ -191,7 +197,7 @@ namespace Yatzy
             if (SinglePlayerGame) UpdateGameInfo();
             else _lobby.UpdateDicevalue(_activeplayer.Dices);
 
-            if (_activeplayer._numberofrolls <= 0) { _activeplayer.OutofRolls = false; return; }
+            if (_activeplayer._numberofrolls <= 0) { _activeplayer.OutofRolls = false; } //return; }
             
         }
 
@@ -211,6 +217,12 @@ namespace Yatzy
 
         public void UpdateDiceValue(string dice)
         {
+            if (_activeplayer._numberofrolls >=1 && _activeplayer._numberofrolls <= 4)
+            {
+                _activeplayer.ShouldAnimate = false;
+                _activeplayer.ShouldAnimate = true;
+                if (!_ismuted) AddSoundEffectsToRollDiceButton();
+            }
             var updateddice = JsonConvert.DeserializeObject<List<int>>(dice);
             if (_activeplayer.Dices == null) _activeplayer.InititalizeDices();
             for (int i = 0; i < updateddice.Count; i++)
@@ -286,12 +298,11 @@ namespace Yatzy
         }
 
         private async void NewGame_Click(object sender, RoutedEventArgs e)
-        {
-            
-
+        {             
             if (_activeplayer._numberofrolls <= 0) return;
             if (Players.IndexOf(_activeplayer) != _myplayer) return;
             if (sender is Button button && button.DataContext is Player player && !player.Equals(_activeplayer)) return;
+            
             RollDices();
         }
 
@@ -637,6 +648,7 @@ namespace Yatzy
         private void AddScore_Click(object sender, RoutedEventArgs e)
         {
             if (!SinglePlayerGame && Players.IndexOf(_activeplayer) != _myplayer) return;
+            if (_activeplayer.Dices == null) return;
             //if (sender is Button b && b.DataContext is Player player && !player.Equals(_activeplayer)) return;
             if (sender is Button b && b.DataContext is PointsClass points)
             {
@@ -668,6 +680,7 @@ namespace Yatzy
         private void StrikeScore_Click(object sender, RoutedEventArgs e)
         {
             if (!SinglePlayerGame && Players.IndexOf(_activeplayer) != _myplayer) return;
+            if (_activeplayer.Dices == null) return;
             if (sender is Button b && b.DataContext is PointsClass points)
             {
                 if (_activeplayer.Dices.Count == 0) return;
@@ -714,15 +727,6 @@ namespace Yatzy
         private void Mute_Button_Click(object sender, RoutedEventArgs e)
         {
             IsMuted = !IsMuted;
-            //MuteButton.Content = new TextBlock
-            //{
-            //    FontFamily = new FontFamily("Segoe MDL2 Assets"),
-            //    Text = _ismuted ? "\uE198" : "\uE995", // Muted : Sound
-            //    FontSize = 24,
-            //    HorizontalAlignment = HorizontalAlignment.Center,
-            //    VerticalAlignment = VerticalAlignment.Center
-            //};
-            //MuteButton.Content = _ismuted ? "&#xE995;" : "&#xE198;";
         }
     }
 

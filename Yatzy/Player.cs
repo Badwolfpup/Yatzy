@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace Yatzy
 {
@@ -88,7 +89,16 @@ namespace Yatzy
             }
         }
 
-
+        private bool _shouldAnimate;
+        public bool ShouldAnimate
+        {
+            get => _shouldAnimate;
+            set
+            {
+                _shouldAnimate = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ShouldAnimate)));
+            }
+        }
 
 
         private bool _myturn;
@@ -102,6 +112,7 @@ namespace Yatzy
                     _myturn = value;
                     BorderBrush = _myturn ? Brushes.Red : Brushes.Black;
                     OnPropertyChanged(nameof(MyTurn));
+
                 }
             }
         }
@@ -143,7 +154,6 @@ namespace Yatzy
                 if (numrolls != value)
                 {
                     numrolls = value;
-                    //CanSpin = numrolls > 1 && numrolls <= 4;
                     OnPropertyChanged(nameof(_numberofrolls));
                 }
             }
