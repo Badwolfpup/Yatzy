@@ -176,7 +176,7 @@ namespace Yatzy
             
             if (_activeplayer.Dices == null) _activeplayer.InititalizeDices();
             if (SinglePlayerGame && _activeplayer._numberofrolls >= 1 && _activeplayer._numberofrolls <= 4) RotateDice();
-            else if (_activeplayer._numberofrolls >= 1 && _activeplayer._numberofrolls <= 4) RotateDice();
+            else if (_activeplayer._numberofrolls >= 1 && _activeplayer._numberofrolls <= 4) _lobby.AnimateDice();
 
 
             for (int i = 0; i < 5; i++)
